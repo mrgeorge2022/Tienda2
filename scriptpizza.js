@@ -283,7 +283,7 @@ function displayProducts(category = '', searchQuery = '') {
   const products = [
     { 
       id: 18, 
-      image: 'img/productos/pizzamargarita.jpg', 
+      image: 'img/productos/armatupizza.jpg', 
       name: 'Arma Tu Pizza', 
       category: ['todos', 'pizzas'], 
       description: '¡La clásica pizza Margarita con queso mozzarella y albahaca fresca!' 
@@ -454,7 +454,7 @@ function openModal(productId) {
     },
     { 
       id: 19, 
-      image: 'img/productos/pizzamargarita.jpg', 
+      image: 'img/productos/armatupizza.jpg', 
       name: 'Pizza Margarita', 
       category: ['todos', 'pizzas', 'recomendados'], 
       price: 20000, 
