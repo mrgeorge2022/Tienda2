@@ -160,7 +160,8 @@ function loadCart() {
         
         <!-- Contenedor de acciones -->
         <div class="action-container">
-            <img id="basura" src="img/iconos/basura.png" alt="Eliminar" onclick="removeItem(${index})">
+        <img id="basura" src="img/iconos/basura.png" alt="Eliminar" onclick="removeItem(${index}, this)">
+
             <div class="subtotal-popup">
                 <p>$${formatNumber(subtotal)}</p>
             </div>
@@ -172,7 +173,7 @@ const detailsButton = document.createElement('button');
 detailsButton.classList.add('toggle-details-btn');
 detailsButton.innerHTML = `
     <span>Detalles del Producto</span>
-    <img src="img/iconos/arrow-down.png" alt="Flecha" class="arrow-icon">
+    <img src="img/iconos/arrow-down.png" alt="Flecha" class="arrow-icon" >
 `; // Agregar texto y flecha como imagen
 detailsButton.onclick = function () {
     toggleDetails(detailsElement, detailsButton);
@@ -229,43 +230,31 @@ detailsButton.onclick = function () {
     }
 
 
-// FUNCIÓN PARA ELIMINAR UN PRODUCTO DEL CARRITO
-function removeItem(index) {
-const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-    
-// Eliminar el producto en la posición indicada
-cartItems.splice(index, 1);
 
-// Guardar de nuevo el carrito en el localStorage
-localStorage.setItem('cart', JSON.stringify(cartItems));
-    
-// Recargar el carrito
-loadCart();}
 
-// FUNCIÓN PARA ELIMINAR UN PRODUCTO DEL CARRITO CON (ANIMACIÓN)
-function removeItem(index) {
-const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+// FUNCIÓN PARA ELIMINAR UN PRODUCTO DEL CARRITO CON ANIMACIÓN
+function removeItem(index, element) {
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItemsList = document.getElementById('cart-items-list');
 
-// Obtener el elemento del producto específico
-const cartItemsList = document.getElementById('cart-items-list');
-const itemElement = cartItemsList.children[index];
+    // Obtener el contenedor del producto específico (el contenedor 'cart-item' al que pertenece el botón presionado)
+    const itemElement = element.closest('.cart-item'); // Seleccionar el div contenedor del producto
 
-// Añadir la clase de animación
-itemElement.classList.add('fade-out');
+    // Añadir la clase de animación al producto
+    itemElement.classList.add('fade-out');
 
-// Esperar a que termine la animación (0.5s) y luego eliminar el elemento
-setTimeout(() => {
-// Eliminar el producto en la posición indicada
-cartItems.splice(index, 1);
+    // Esperar a que termine la animación (0.5s) y luego eliminar el producto
+    setTimeout(() => {
+        // Eliminar el producto en la posición indicada
+        cartItems.splice(index, 1);
 
-// Guardar de nuevo el carrito en el localStorage
-localStorage.setItem('cart', JSON.stringify(cartItems));
+        // Guardar de nuevo el carrito en el localStorage
+        localStorage.setItem('cart', JSON.stringify(cartItems));
 
-// Recargar el carrito
-loadCart();
-}, 500); // Tiempo que dura la animación
+        // Recargar el carrito
+        loadCart();
+    }, 500); // Tiempo que dura la animación
 }
-
 
 
 

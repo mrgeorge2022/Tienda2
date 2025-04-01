@@ -273,7 +273,6 @@ header nav button:hover {
 
 
 
-
 #nombre_precio_intrucciones{
     width: 350px;               /* Definir el ancho del contenedor */
     text-align: left;           /* Alineación del texto */
@@ -311,6 +310,13 @@ header nav button:hover {
 .cart-item button:hover {
     background-color: #ff0000;
     color: #fafafa;
+}
+
+
+/* Animación de desvanecimiento */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
 }
 
 h4{
