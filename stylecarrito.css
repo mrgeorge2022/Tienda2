@@ -163,10 +163,11 @@ header nav button:hover {
 }
 
 .cart-item {
-    height: 80px;
+    height: 60px;
     display: flex;
-    padding: 8px;
+    padding: 0px;
     justify-content: space-between;
+    margin-top: 30px;
 }
 
 
@@ -174,7 +175,6 @@ header nav button:hover {
 #contenedordeimagencarrito{
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 .cart-product-image {
     width: 80px; /* Ajusta el tamaño según prefieras */
@@ -195,65 +195,38 @@ header nav button:hover {
 .product-details {
     font-size: 13px;
     text-align: left;
-    margin-bottom: 5px;
+    margin-bottom: 30px;
     padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border-bottom: 2px solid #ddd;
     display: none; /* Ocultar por defecto */
     animation: slideDown 0.3s ease-out; /* Animación al mostrar */
 }
 
 .toggle-details-btn {
-    background-color: #ddd;
-    color: rgb(255, 255, 255);
+    display: flex;
+    background-color: transparent;
+    color: #000000;
     padding: 5px 10px;
     cursor: pointer;
+    border-radius: 0px;
+    border-bottom: solid 2px #ddd;
     margin-top: 0px;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     font-size: 13px;
     font-weight: lighter;
     transition: background-color 0.3s, transform 0.3s; /* Transiciones suaves */
 }
 
-/* Animación para mostrar los detalles */
-@keyframes slideDown {
-    0% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.arrow-icon {
+    margin-left: 10px;
+    display: inline-block;
+    transition: transform 0.3s ease-in-out; /* Suaviza la animación */
+    cursor: pointer; /* Cambia el cursor al pasar sobre la flecha */
 }
 
-/* Animación para ocultar los detalles */
-@keyframes slideUp {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-}
-
-/* Animación para ocultar el botón de ver más detalles */
-.toggle-details-btn.fade-out {
-    animation: fadeOut 0.5s forwards;
-}
-
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8) translateX(20px);
-    }
+/* Rotación de la flecha al hacer clic */
+.arrow-icon.rotate {
+    transform: rotate(180deg);
 }
 
 
@@ -284,15 +257,12 @@ header nav button:hover {
 }
 
 #basura{
+    top: 1px;
     position: relative;
     width: 20px;/* Tamaño ajustado */
     height: 20px;/* Tamaño ajustado */
 }
 
-/* Subtotal en la parte inferior derecha */
-.action-container .subtotal-popup {
-margin-top: 30px;
-}
 
 /* Alineación del texto dentro de la mini ventana */
 .action-container .subtotal-popup p {
@@ -301,22 +271,6 @@ margin-top: 30px;
 }
 
 
-
-/* Animación para el elemento que desaparece al darle clik en la imagen de basura*/
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8) translateX(20px);
-    }
-}
-
-.cart-item.fade-out {
-    animation: fadeOut 0.5s forwards;
-}
 
 
 
@@ -332,14 +286,14 @@ margin-top: 30px;
 }
 
 #nombre_precio_intrucciones p{
-    margin: 2px;
+    margin-bottom: 2px;
 }
 
 
 .cart-item p {
     max-width: 80%;
     max-height: 25px;
-    margin: 5px 0;
+
     font-size: 13px;
 }
 

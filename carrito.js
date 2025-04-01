@@ -1,5 +1,5 @@
 // Función para ocultar la animación de bienvenida
-function hideWelcomeLoader() {
+/*function hideWelcomeLoader() {
     var welcomeLoader = document.getElementById('welcome-loader');
     welcomeLoader.style.display = 'none'; // Ocultar la animación de bienvenida
 }
@@ -8,7 +8,7 @@ function hideWelcomeLoader() {
 window.addEventListener('load', function() {
     // Esperamos 4 segundos para que la animación de bienvenida se complete
     setTimeout(hideWelcomeLoader, 700); // El tiempo puede ser ajustado (0.7s = 0.7 segundos)
-});
+});*/
 
 
 
@@ -155,7 +155,7 @@ function loadCart() {
             <!-- Información del producto -->
             <p><strong>${product.name} - $${formatNumber(price)}</strong></p>
             <p><strong>Cantidad: </strong>${quantity}</p>
-            <p><strong>Indicaciones: </strong><span class="instructions-text">${product.instructions || ''}</span></p>
+            <p><strong>Indicaciones: </strong>${product.instructions || ''}</p>
         </div>
         
         <!-- Contenedor de acciones -->
@@ -166,14 +166,17 @@ function loadCart() {
             </div>
         </div>
     `;
-
-    // Crear el botón "Ver más detalles"
-    const detailsButton = document.createElement('button');
-    detailsButton.classList.add('toggle-details-btn');
-    detailsButton.innerText = 'Ver más detalles';
-    detailsButton.onclick = function () {
-        toggleDetails(detailsElement, detailsButton);
-    };
+    
+// Crear el botón "Ver más detalles"
+const detailsButton = document.createElement('button');
+detailsButton.classList.add('toggle-details-btn');
+detailsButton.innerHTML = `
+    <span>Detalles del Producto</span>
+    <img src="img/iconos/arrow-down.png" alt="Flecha" class="arrow-icon">
+`; // Agregar texto y flecha como imagen
+detailsButton.onclick = function () {
+    toggleDetails(detailsElement, detailsButton);
+};
 
     // Crear el contenedor de detalles (inicialmente oculto)
     const detailsElement = document.createElement('div');
@@ -192,7 +195,7 @@ function loadCart() {
 
     // Sumar el subtotal al total general
     total += subtotal;
-});
+    });
 
         // Habilitar el <select> de opciones de pago si el carrito no está vacío
         if (opcionesPago) {
@@ -203,19 +206,27 @@ function loadCart() {
     // MOSTRAR EL TOTAL CON FORMATO DE PUNTOS DE MIL
     cartTotal.innerText = `Total: $${formatNumber(total)}`;
 
+
     // Guardar el total en localStorage
     localStorage.setItem('totalCarrito', total);
-}
-
-function toggleDetails(detailsElement, button) {
-    if (detailsElement.style.display === 'none' || detailsElement.style.display === '') {
-        detailsElement.style.display = 'block'; // Mostrar detalles
-        button.innerText = 'Ver menos detalles'; // Cambiar texto del botón
-    } else {
-        detailsElement.style.display = 'none'; // Ocultar detalles
-        button.innerText = 'Ver más detalles'; // Cambiar texto del botón
     }
-}
+
+    function toggleDetails(detailsElement, button) {
+        const arrowIcon = button.querySelector('.arrow-icon');
+        const textSpan = button.querySelector('span:first-child');
+
+        if (detailsElement.style.display === 'none' || detailsElement.style.display === '') {
+            detailsElement.style.display = 'block'; // Mostrar detalles
+            textSpan.innerText = 'Detalles del Producto'; // Cambiar texto del botón
+            arrowIcon.style.transform = 'rotate(180deg)'; // Rotar la imagen hacia arriba
+            button.style.border = 'none'; // Quitar el borde del botón
+        } else {
+            detailsElement.style.display = 'none'; // Ocultar detalles
+            textSpan.innerText = 'Detalles del Producto'; // Cambiar texto del botón
+            arrowIcon.style.transform = 'rotate(0deg)'; // Rotar la imagen hacia abajo
+            button.style.borderBottom = 'solid 2px #ddd'; // Añadir el borde en la parte inferior del botón
+        }
+    }
 
 
 // FUNCIÓN PARA ELIMINAR UN PRODUCTO DEL CARRITO
@@ -338,7 +349,6 @@ function cerrarModaldatospersonales() {
 const inputNombre = document.getElementById('nombre');
 inputNombre.addEventListener('input', () => {
     // Validar si solo hay letras y espacios
-    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
     // Si el texto contiene caracteres no permitidos, los eliminamos
     inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
 });
