@@ -286,7 +286,7 @@ function displayProducts(category = '', searchQuery = '') {
       image: 'img/productos/armatupizza.jpg', 
       name: 'Arma Tu Pizza', 
       category: ['todos', 'pizzas'], 
-      description: '¡La clásica pizza Margarita con queso mozzarella y albahaca fresca!' 
+      description: '¡Crea tu pizza con los ingredientes que prefieras!' 
     },
     { 
       id: 19, 
@@ -431,7 +431,7 @@ function openModal(productId) {
       name: 'Arma Tu Pizza',
       category: ['todos', 'pizzas', 'recomendados'],
       price: 20000,
-      description: '¡Personaliza tu pizza con los ingredientes que más te gusten!',
+      description: '¡Crea tu pizza con los ingredientes que prefieras!',
       flavorOptions: [
         { name: 'Jamón', price: 5000 },
         { name: 'Queso', price: 4000 },
@@ -458,17 +458,17 @@ function openModal(productId) {
       name: 'Pizza Margarita', 
       category: ['todos', 'pizzas', 'recomendados'], 
       price: 20000, 
-      description: '¡La clásica pizza Margarita con queso mozzarella y albahaca fresca!',
+      description: '¡La tradicional pizza Margarita con queso mozzarella y albahaca fresca!',
       checkboxOptions: [
         { name: 'Borde Queso', price: 10000 },
         { name: 'Borde Queso y Bocadillo', price: 15000 }
-      ], // Opciones específicas con precios
+      ],
       sizeOptions: [
         { size: 'Pequeña x6', price: 10000 },
         { size: 'Mediana x8', price: 20000 },
         { size: 'Familiar x12', price: 50000 }
-      ], // Opciones de tamaño con precios
-      additionalOptions: ['Orégano', 'Salsa de ajo', 'Maíz'] // Opciones adicionales
+      ],
+      additionalOptions: ['Orégano', 'Salsa de ajo', 'Maíz']
     },
     { 
       id: 20, 
@@ -481,231 +481,186 @@ function openModal(productId) {
         { name: 'Extra pepperoni', price: 12000 },
         { name: 'Sin queso', price: 0 },
         { name: 'Masa gruesa', price: 5000 }
-      ], // Opciones específicas con precios
+      ],
       sizeOptions: [
         { size: 'Pequeña x6', price: 12000 },
         { size: 'Mediana x8', price: 22000 },
         { size: 'Familiar x12', price: 52000 }
-      ], // Opciones de tamaño con precios
-      additionalOptions: ['Orégano', 'Salsa de ajo', 'Maíz'] // Opciones adicionales
+      ],
+      additionalOptions: ['Orégano', 'Salsa de ajo', 'Maíz']
     },
   ];
 
+  const product = products.find(p => p.id === productId);
+  if (product) {
+    document.getElementById('modal-product-name').innerText = product.name;
+    document.getElementById('modal-product-image').src = product.image;
+    document.getElementById('modal-product-description').innerText = product.description;
 
-// FUNCIÓN PARA MOSTRAR LA INFORMACIÓN DEL PRODUCTO EN UN MODAL
-const product = products.find(p => p.id === productId);
-if (product) {
-  // Mostrar información básica del producto
-  document.getElementById('modal-product-name').innerText = product.name;
-  document.getElementById('modal-product-image').src = product.image;
-  document.getElementById('modal-product-description').innerText = product.description;
+    let dynamicPrice = 0;
 
-  // Inicializar el precio dinámico
-  let dynamicPrice = 0;
+    const updatePrice = () => {
+      const sizeCheckboxes = document.querySelectorAll('#modal-size-container input[type="checkbox"]');
+      const borderCheckboxes = document.querySelectorAll('#modal-checkbox-container input[type="checkbox"]');
+      const additionalCheckboxes = document.querySelectorAll('#modal-additional-container input[type="checkbox"]');
+      const flavorCheckboxes = document.querySelectorAll('#modal-flavor-container input[type="checkbox"]');
+      const quantityInput = document.getElementById('modal-quantity');
+      const totalPriceElement = document.getElementById('modal-product-price');
 
-  // Actualizar el precio en el modal
-  const updatePrice = () => {
-    const sizeCheckboxes = document.querySelectorAll('#modal-size-container input[type="checkbox"]');
-    const borderCheckboxes = document.querySelectorAll('#modal-checkbox-container input[type="checkbox"]');
-    const additionalCheckboxes = document.querySelectorAll('#modal-additional-container input[type="checkbox"]');
-    const flavorCheckboxes = document.querySelectorAll('#modal-flavor-container input[type="checkbox"]');
-    const quantityInput = document.getElementById('modal-quantity'); // Campo de cantidad
-    const totalPriceElement = document.getElementById('modal-product-price'); // Elemento para mostrar el precio total
+      dynamicPrice = 0;
 
-    // Reiniciar el precio dinámico
-    dynamicPrice = 0;
-
-    // Sumar precios de tamaños seleccionados
-    sizeCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        const sizeOption = product.sizeOptions.find(option => option.size === cb.value);
-        if (sizeOption) dynamicPrice += sizeOption.price;
-      }
-    });
-
-    // Sumar precios de bordes seleccionados
-    borderCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        const borderOption = product.checkboxOptions.find(option => option.name === cb.value);
-        if (borderOption) dynamicPrice += borderOption.price;
-      }
-    });
-
-    // Sumar precios de sabores seleccionados
-    flavorCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        const flavorOption = product.flavorOptions.find(option => option.name === cb.value);
-        if (flavorOption) dynamicPrice += flavorOption.price;
-      }
-    });
-
-    // Sumar precios de adicionales seleccionados
-    additionalCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        // Aquí puedes agregar un precio fijo para adicionales si es necesario
-        dynamicPrice += 0; // Cambia este valor si los adicionales tienen precio
-      }
-    });
-
-    // Obtener la cantidad seleccionada
-    const quantity = parseInt(quantityInput.value, 10) || 1; // Asegurarse de que sea un número válido
-
-    // Calcular el precio total
-    const totalPrice = dynamicPrice * quantity;
-
-    // Actualizar el precio total en el DOM
-    totalPriceElement.innerText = `${formatNumber(totalPrice)}`;
-  };
-
-  // Escuchar cambios en el campo de cantidad
-  document.getElementById('modal-quantity').addEventListener('input', updatePrice);
-
-  // Escuchar cambios en los checkboxes
-  document.querySelectorAll('#modal-size-container input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', updatePrice);
-  });
-  document.querySelectorAll('#modal-checkbox-container input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', updatePrice);
-  });
-  document.querySelectorAll('#modal-additional-container input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', updatePrice);
-  });
-  document.querySelectorAll('#modal-flavor-container input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', updatePrice);
-  });
-
-  // Generar opciones de tamaño dinámicamente con precios
-  const modalSizeContainer = document.getElementById('modal-size-container');
-  modalSizeContainer.innerHTML = ''; // Limpiar contenido previo
-  product.sizeOptions.forEach(option => {
-    const checkbox = document.createElement('label');
-    checkbox.innerHTML = `
-      <input type="checkbox" name="size" value="${option.size}">
-       ${option.size}: $${formatNumber(option.price)}
-    `;
-    const input = checkbox.querySelector('input');
-
-    // Permitir solo una selección
-    input.addEventListener('change', () => {
-      const checkboxes = modalSizeContainer.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(cb => {
-        if (cb !== input) cb.checked = false;
+      sizeCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          const sizeOption = product.sizeOptions.find(option => option.size === cb.value);
+          if (sizeOption) dynamicPrice += sizeOption.price;
+        }
       });
-      updatePrice(); // Actualizar el precio
-    });
 
-    modalSizeContainer.appendChild(checkbox);
-  });
-
-  // Generar checkboxes dinámicamente para bordes
-  const modalCheckboxContainer = document.getElementById('modal-checkbox-container');
-  modalCheckboxContainer.innerHTML = ''; // Limpiar contenido previo
-  product.checkboxOptions.forEach(option => {
-    const checkbox = document.createElement('label');
-    checkbox.innerHTML = `
-      <input type="checkbox" value="${option.name}">
-      ${option.name}: $${formatNumber(option.price)}
-    `;
-    const input = checkbox.querySelector('input');
-
-    // Permitir solo una selección
-    input.addEventListener('change', () => {
-      const checkboxes = modalCheckboxContainer.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(cb => {
-        if (cb !== input) cb.checked = false;
+      borderCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          const borderOption = product.checkboxOptions.find(option => option.name === cb.value);
+          if (borderOption) dynamicPrice += borderOption.price;
+        }
       });
-      updatePrice(); // Actualizar el precio
+
+      flavorCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          const flavorOption = product.flavorOptions.find(option => option.name === cb.value);
+          if (flavorOption) dynamicPrice += flavorOption.price;
+        }
+      });
+
+      additionalCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          dynamicPrice += 0;
+        }
+      });
+
+      const quantity = parseInt(quantityInput.value, 10) || 1;
+      const totalPrice = dynamicPrice * quantity;
+
+      totalPriceElement.innerText = `${formatNumber(totalPrice)}`;
+    };
+
+    document.getElementById('modal-quantity').addEventListener('input', updatePrice);
+
+    document.querySelectorAll('#modal-size-container input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updatePrice);
+    });
+    document.querySelectorAll('#modal-checkbox-container input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updatePrice);
+    });
+    document.querySelectorAll('#modal-additional-container input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updatePrice);
+    });
+    document.querySelectorAll('#modal-flavor-container input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updatePrice);
     });
 
-    modalCheckboxContainer.appendChild(checkbox);
-  });
+    const modalSizeContainer = document.getElementById('modal-size-container');
+    modalSizeContainer.innerHTML = '';
+    product.sizeOptions.forEach(option => {
+      const checkbox = document.createElement('label');
+      checkbox.innerHTML = `
+        <input type="checkbox" name="size" value="${option.size}">
+         ${option.size}: $${formatNumber(option.price)}
+      `;
+      const input = checkbox.querySelector('input');
 
-  // Generar checkboxes dinámicamente para sabores (solo para el producto con id 18)
-  const modalFlavorContainer = document.getElementById('modal-flavor-container');
-  modalFlavorContainer.innerHTML = ''; // Limpiar contenido previo
-  
-  if (product.id === 18) { // Exclusivamente para el producto con id 18
-    document.getElementById('Eligesabores').style.display = 'block'; // Asegurar que el título de sabores sea visible
-    modalFlavorContainer.style.display = 'block'; // Asegurar que el contenedor de sabores sea visible
+      input.addEventListener('change', () => {
+        const checkboxes = modalSizeContainer.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+          if (cb !== input) cb.checked = false;
+        });
+        updatePrice();
+      });
 
-    product.flavorOptions.forEach(option => {
+      modalSizeContainer.appendChild(checkbox);
+    });
+
+    const modalCheckboxContainer = document.getElementById('modal-checkbox-container');
+    modalCheckboxContainer.innerHTML = '';
+    product.checkboxOptions.forEach(option => {
       const checkbox = document.createElement('label');
       checkbox.innerHTML = `
         <input type="checkbox" value="${option.name}">
         ${option.name}: $${formatNumber(option.price)}
       `;
       const input = checkbox.querySelector('input');
-  
-      // Limitar la selección a un máximo de 2 sabores
+
       input.addEventListener('change', () => {
-        const checkboxes = modalFlavorContainer.querySelectorAll('input[type="checkbox"]');
-        const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-  
-        if (selectedCount > 2) {
-          input.checked = false; // Desmarcar si ya hay 2 seleccionados
-        }
-        updatePrice(); // Actualizar el precio
+        const checkboxes = modalCheckboxContainer.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+          if (cb !== input) cb.checked = false;
+        });
+        updatePrice();
       });
-  
-      modalFlavorContainer.appendChild(checkbox);
-    });
-  } else {
-    modalFlavorContainer.innerHTML = ''; // Limpiar el contenedor de sabores
-    document.getElementById('Eligesabores').style.display = 'none'; // Ocultar el título de sabores
-    modalFlavorContainer.style.display = 'none'; // Ocultar el contenedor de sabores
-  }
 
-  // Generar checkboxes dinámicamente para adicionales
-  const modalAdditionalContainer = document.getElementById('modal-additional-container');
-  modalAdditionalContainer.innerHTML = ''; // Limpiar contenido previo
-  product.additionalOptions.forEach(option => {
-    const checkbox = document.createElement('label');
-    checkbox.innerHTML = `
-      <input type="checkbox" value="${option}">
-      ${option}
-    `;
-    const input = checkbox.querySelector('input');
-
-    // Limitar la selección a solo 2 adicionales
-    input.addEventListener('change', () => {
-      const checkboxes = modalAdditionalContainer.querySelectorAll('input[type="checkbox"]');
-      const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-
-      if (selectedCount > 2) {
-        input.checked = false; // Desmarcar si ya hay 2 seleccionados
-      }
-      updatePrice(); // Actualizar el precio
+      modalCheckboxContainer.appendChild(checkbox);
     });
 
-    modalAdditionalContainer.appendChild(checkbox);
-  });
+    const modalFlavorContainer = document.getElementById('modal-flavor-container');
+    modalFlavorContainer.innerHTML = '';
+    
+    if (product.id === 18) {
+      document.getElementById('Eligesabores').style.display = 'block';
+      modalFlavorContainer.style.display = 'block';
 
-  // Mostrar el modal
-  document.getElementById('product-modal').style.display = 'flex';
+      product.flavorOptions.forEach(option => {
+        const checkbox = document.createElement('label');
+        checkbox.innerHTML = `
+          <input type="checkbox" value="${option.name}">
+          ${option.name}: $${formatNumber(option.price)}
+        `;
+        const input = checkbox.querySelector('input');
+    
+        input.addEventListener('change', () => {
+          const checkboxes = modalFlavorContainer.querySelectorAll('input[type="checkbox"]');
+          const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    
+          if (selectedCount > 2) {
+            input.checked = false;
+          }
+          updatePrice();
+        });
+    
+        modalFlavorContainer.appendChild(checkbox);
+      });
+    } else {
+      modalFlavorContainer.innerHTML = '';
+      document.getElementById('Eligesabores').style.display = 'none';
+      modalFlavorContainer.style.display = 'none';
+    }
 
-  // Inicializar el precio en el modal
-  updatePrice();
+    const modalAdditionalContainer = document.getElementById('modal-additional-container');
+    modalAdditionalContainer.innerHTML = '';
+    product.additionalOptions.forEach(option => {
+      const checkbox = document.createElement('label');
+      checkbox.innerHTML = `
+        <input type="checkbox" value="${option}">
+        ${option}
+      `;
+      const input = checkbox.querySelector('input');
 
+      input.addEventListener('change', () => {
+        const checkboxes = modalAdditionalContainer.querySelectorAll('input[type="checkbox"]');
+        const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
 
+        if (selectedCount > 2) {
+          input.checked = false;
+        }
+        updatePrice();
+      });
 
+      modalAdditionalContainer.appendChild(checkbox);
+    });
 
-    // Buscar el producto en el carrito
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const existingProduct = cart.find(item => item.name === product.name);
+    document.getElementById('modal-product-instructions').value = ''; // Limpiar instrucciones
+    document.getElementById('modal-quantity').value = 1; // Reiniciar cantidad
 
-  // Si el producto ya está en el carrito, mostrar las instrucciones y cantidad previas
-  if (existingProduct) {
-    document.getElementById('modal-product-instructions').value = existingProduct.instructions || '';
-    document.getElementById('modal-quantity').value = existingProduct.quantity || 1;
-  } else {
-    // Si no está en el carrito, reiniciar los campos
-    document.getElementById('modal-product-instructions').value = '';
-    document.getElementById('modal-quantity').value = 1;
+    document.getElementById('product-modal').style.display = 'flex';
+    updatePrice();
   }
-  
-
-  document.getElementById('product-modal').style.display = 'flex'; // Mostrar modal centrado
-}
 }
 
 // FUNCIÓN PARA CERRAR EL MODAL
@@ -755,6 +710,8 @@ function addToCartFromModal() {
   // Verificar si hay campos vacíos en los checkboxes
   const sizeCheckboxes = document.querySelectorAll('#modal-size-container input[type="checkbox"]');
   const flavorCheckboxes = name === "Arma Tu Pizza" ? document.querySelectorAll('#modal-flavor-container input[type="checkbox"]') : [];
+  const borderCheckboxes = document.querySelectorAll('#modal-checkbox-container input[type="checkbox"]');
+  const additionalCheckboxes = document.querySelectorAll('#modal-additional-container input[type="checkbox"]');
 
   const isSizeSelected = Array.from(sizeCheckboxes).some(cb => cb.checked);
   const isFlavorSelected = name === "Arma Tu Pizza" ? Array.from(flavorCheckboxes).some(cb => cb.checked) : true; // Verificar si hay sabores seleccionados solo para "Arma Tu Pizza"
@@ -784,22 +741,35 @@ function addToCartFromModal() {
     return; // Salir de la función
   }
 
+  // Recopilar los valores seleccionados de los checkboxes
+  const selectedSizes = Array.from(sizeCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+  const selectedFlavors = Array.from(flavorCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+  const selectedBorders = Array.from(borderCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+  const selectedAdditionals = Array.from(additionalCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+  // Crear el objeto del producto con los datos recopilados
+  const productToAdd = {
+    name,
+    price,
+    instructions,
+    quantity: newQuantity,
+    image,
+    selectedSizes,
+    selectedFlavors,
+    selectedBorders,
+    selectedAdditionals
+  };
+
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   // Agregar el producto al carrito sin eliminar los existentes
-  cart.push({ name, price, instructions, quantity: newQuantity, image });
+  cart.push(productToAdd);
 
   // Guardar el carrito en localStorage
   localStorage.setItem('cart', JSON.stringify(cart));
 
   // Actualizar el contador del carrito
   updateCartCount();
-
-
-
-
-
-  
 
   // MOSTRAR LA ANIMACIÓN DEL CARRITO EXPANDIÉNDOSE
   const cartButton = document.getElementById('floating-cart');
@@ -888,13 +858,13 @@ function validateQuantityInput() {
 
 
 const horariosTienda = [
-  { dia: 0, horaApertura: 18, horaCierre: 24 },  // Domingo
+  { dia: 0, horaApertura: 1, horaCierre: 24 },  // Domingo
   { dia: 1, horaApertura: 1, horaCierre: 24 },  // Lunes 
-  { dia: 2, horaApertura: 18, horaCierre: 24 },  // Martes
-  { dia: 3, horaApertura: null, horaCierre: null},  // Miércoles - cerrdado
-  { dia: 4, horaApertura: 18, horaCierre: 24 },  // Jueves 
-  { dia: 5, horaApertura: 18, horaCierre: 24 },  // Viernes
-  { dia: 6, horaApertura: 18, horaCierre: 24 },  // Sábado
+  { dia: 2, horaApertura: 1, horaCierre: 24 },  // Martes
+  { dia: 3, horaApertura: 1, horaCierre: 24},  // Miércoles - cerrdado
+  { dia: 4, horaApertura: 1, horaCierre: 24 },  // Jueves 
+  { dia: 5, horaApertura: 1, horaCierre: 24 },  // Viernes
+  { dia: 6, horaApertura: 1, horaCierre: 24 },  // Sábado
 ];
 
 // FUNCIÓN PARA VERIFICAR SI LA TIENDA ESTÁ ABIERTA

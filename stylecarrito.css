@@ -163,27 +163,25 @@ header nav button:hover {
 }
 
 .cart-item {
-    height: 120px;
+    height: 80px;
     display: flex;
-    background-color: #fafafa;
-    border: 1px solid #ddd;
     padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 8px;
     justify-content: space-between;
 }
+
+
 
 #contenedordeimagencarrito{
     display: flex;
     justify-content: center;
-    /*align-items: center; para centrar la imagen verticalmente*/ 
+    align-items: center;
 }
 .cart-product-image {
     width: 80px; /* Ajusta el tamaño según prefieras */
     height: 50px; /* Mantén esta altura para un contenedor cuadrado */
     margin-right: 10px;
     overflow: hidden; /* Asegura que la imagen no se salga del contenedor */
-    border-radius: 8px; /* Bordes redondeados */
+
 }
 
 /* Estilos para la imagen dentro del contenedor */
@@ -194,7 +192,69 @@ header nav button:hover {
     display: block;
 }
 
+.product-details {
+    font-size: 13px;
+    text-align: left;
+    margin-bottom: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: none; /* Ocultar por defecto */
+    animation: slideDown 0.3s ease-out; /* Animación al mostrar */
+}
 
+.toggle-details-btn {
+    background-color: #ddd;
+    color: rgb(255, 255, 255);
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: lighter;
+    transition: background-color 0.3s, transform 0.3s; /* Transiciones suaves */
+}
+
+/* Animación para mostrar los detalles */
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación para ocultar los detalles */
+@keyframes slideUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Animación para ocultar el botón de ver más detalles */
+.toggle-details-btn.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) translateX(20px);
+    }
+}
 
 
 
@@ -204,7 +264,7 @@ header nav button:hover {
     font-size: 15px;
     background-color: #00000070;
     
-}
+}  
 
 /* Contenedor de acciones */
 .action-container {
@@ -343,6 +403,12 @@ h4{
 #opcionesPago:hover {
     border-color: #00b13b; /* Borde rojo cuando el mouse pasa por encima */
     background-color: #ffffff; /* Fondo más claro */
+}
+
+/* Clase para resaltar el select de opciones de pago */
+.highlight-error {
+    border: 2px solid red;
+    box-shadow: 0 0 5px red;
 }
 
 

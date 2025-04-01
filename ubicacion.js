@@ -824,11 +824,21 @@ function finalizarCompra() {
 
     const hora = fechaActual.toLocaleTimeString('es-ES', { hour12: false }); // Formato 24 horas
 
-    // Crear el bloque de texto con los productos seleccionados
-    let messageProducts = cartItems.map(item => 
-        `*${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}*` +  // Total de cada producto
-        `\n   _${item.instructions || ''}_`  // Instrucciones del producto
-    ).join('\n');
+    // Crear el bloque de texto con los productos seleccionados en checkboxes
+    let messageProducts = cartItems.map(item => {
+        const selectedOptions = `
+            ${item.selectedSizes && item.selectedSizes.length > 0 ? `Tamaño: ${item.selectedSizes.join(', ')}` : ''}
+            ${item.selectedFlavors && item.selectedFlavors.length > 0 ? `Sabor/es: ${item.selectedFlavors.join(', ')}` : ''}
+            ${item.selectedBorders && item.selectedBorders.length > 0 ? `Borde: ${item.selectedBorders.join(', ')}` : ''}
+            ${item.selectedAdditionals && item.selectedAdditionals.length > 0 ? `Adicionales: ${item.selectedAdditionals.join(', ')}` : ''}
+        `.trim();
+
+
+        
+        return `*${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}*` +
+            `${selectedOptions ? `\n   ${selectedOptions}` : ''}` +
+            `${item.instructions ? `\n   _Instrucciones: ${item.instructions}_` : ''}`;
+    }).join('\n');
 
     // Función para formatear números con puntos de mil
     function formatNumber(value) {
@@ -988,10 +998,18 @@ function imprimirFactura() {
     const fecha = `${dia}/${mes}/${anio}`;
 
     // Crear el bloque de texto con los productos seleccionados
-    let messageProducts = cartItems.map(item => 
-        `${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)} ` +
-        `\n _${item.instructions || ''}_` // Instrucciones del producto
-    ).join('\n');
+    let messageProducts = cartItems.map(item => {
+        const selectedOptions = `
+            ${item.selectedSizes && item.selectedSizes.length > 0 ? `T: ${item.selectedSizes.join(', ')}` : ''}
+            ${item.selectedFlavors && item.selectedFlavors.length > 0 ? `S: ${item.selectedFlavors.join(', ')}` : ''}
+            ${item.selectedBorders && item.selectedBorders.length > 0 ? `B: ${item.selectedBorders.join(', ')}` : ''}
+            ${item.selectedAdditionals && item.selectedAdditionals.length > 0 ? `A: ${item.selectedAdditionals.join(', ')}` : ''}
+        `.trim();
+
+        return `<strong>${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}</strong>` +
+               `${selectedOptions ? `\n   ${selectedOptions.replace(/\n\s+/g, '\n   ')}` : ''}` +
+               `${item.instructions ? `\nInstrucciones:\n${wrapText(item.instructions, 50)}` : ''}`;
+    }).join('\n');
 
     // Obtener los datos de domicilio
     const ubicacion = localStorage.getItem('ubicacion') || document.getElementById('direccion').value || "Ubicación no disponible";
@@ -1000,37 +1018,35 @@ function imprimirFactura() {
     // Generar el mensaje de la factura con el número de factura y domicilio
     let facturaTexto = `
 ------------------------------------------------------
-MR. GEORGE - SINCE 2022
+<strong>MR. GEORGE - SINCE 2022</strong>
 ------------------------------------------------------
 
-DOMICILIO
+<strong>DOMICILIO</strong>
 
-FACTURA Nº: #${numeroFactura}
-FECHA: ${fecha}
-HORA: ${horaCompra}
+<strong>FACTURA Nº:</strong> #${numeroFactura}
+<strong>FECHA:</strong> ${fecha}
+<strong>HORA:</strong> ${horaCompra}
 
-DATOS DEL USUARIO:
-Nombre: ${nombre}
-Teléfono: ${telefono}
+<strong>DATOS DEL USUARIO:</strong>
+<strong>Nombre:</strong> ${nombre}
+<strong>Teléfono:</strong> ${telefono}
 
-DIRECCIÓN:
-${ubicacion}
+<strong>DIRECCIÓN:</strong> ${ubicacion}
 
-PUNTO DE REFERENCIA:
-${puntoDeReferencia}
+<strong>PUNTO DE REFERENCIA:</strong> ${puntoDeReferencia}
 
-PRODUCTOS SELECCIONADOS:
+<strong>PRODUCTOS SELECCIONADOS:</strong>
 
 ${messageProducts}
 
-TOTAL PRODUCTOS: $${formatNumber(totalProductos)}
-COSTO DE DOMICILIO: $${formatNumber(costoDomicilio)}
+<strong>TOTAL PRODUCTOS:</strong> $${formatNumber(totalProductos)}
+<strong>COSTO DE DOMICILIO:</strong> $${formatNumber(costoDomicilio)}
 
-TOTAL A PAGAR: $${formatNumber(totalFinal)}
-MÉTODO DE PAGO: ${metodoPago}
+<strong>TOTAL A PAGAR:</strong> $${formatNumber(totalFinal)}
+<strong>MÉTODO DE PAGO:</strong> ${metodoPago}
 
 ------------------------------------------------------
-¡Gracias por tu compra!
+<strong>¡Gracias por tu compra!</strong>
 ------------------------------------------------------
 `;
 
@@ -1042,6 +1058,14 @@ MÉTODO DE PAGO: ${metodoPago}
     ventanaImpresion.document.close();
     ventanaImpresion.print();
 }
+
+
+function wrapText(text, maxLength) {
+    if (!text) return ''; // Manejar casos donde el texto sea null o undefined
+    const regex = new RegExp(`.{1,${maxLength}}`, 'g'); // Divide el texto en bloques de hasta `maxLength` caracteres
+    return text.match(regex).join('\n'); // Une los bloques con saltos de línea
+}
+
 
 // Función para formatear números con puntos de mil
 function formatNumber(value) {

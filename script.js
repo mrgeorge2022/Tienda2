@@ -445,7 +445,9 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     // Buscar la cantidad del producto en el carrito
     const cartItem = cart.find(item => item.name === product.name);
-    const quantityInCart = cartItem ? cartItem.quantity : 0;
+    const quantityInCart = cart
+    .filter(item => item.name === product.name) // Filtrar los productos con el mismo nombre
+    .reduce((sum, item) => sum + item.quantity, 0); // Sumar las cantidades
 
     productElement.onclick = function() {
       openModal(product.id); // Llama a la función openModal con el ID del producto
@@ -460,7 +462,7 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
         <button onclick="event.stopPropagation(); openModal(${product.id})">Ordenar
 
       <!-- Contador dentro del botón -->
-      ${quantityInCart > 0 ? `<span class="product-quantity">${quantityInCart}</span>` : ''}
+    ${quantityInCart > 0 ? `<span class="product-quantity">${quantityInCart}</span>` : ''}
       
 
         </button>
@@ -689,7 +691,7 @@ function openModal(productId) {
 
 
 
-//FUNCIÓN PARA MOSTRAR LA INFORMACIÓN DEL PRODUCTO EN UN MODAL
+// FUNCIÓN PARA MOSTRAR LA INFORMACIÓN DEL PRODUCTO EN UN MODAL
 const product = products.find(p => p.id === productId);
 if (product) {
   document.getElementById('modal-product-name').innerText = product.name;
@@ -710,7 +712,9 @@ if (product) {
     document.getElementById('modal-product-instructions').value = '';
     document.getElementById('modal-quantity').value = 1;
   }
-  
+
+  // Limpiar el campo de instrucciones después de agregar al carrito
+  document.getElementById('modal-product-instructions').value = '';
 
   document.getElementById('product-modal').style.display = 'flex'; // Mostrar modal centrado
 }
@@ -891,13 +895,13 @@ function validateQuantityInput() {
 
 
 const horariosTienda = [
-  { dia: 0, horaApertura: 18, horaCierre: 24 },  // Domingo
-  { dia: 1, horaApertura: 18, horaCierre: 24 },  // Lunes 
-  { dia: 2, horaApertura: 18, horaCierre: 24 },  // Martes
-  { dia: 3, horaApertura: null, horaCierre: null},  // Miércoles - cerrdado
-  { dia: 4, horaApertura: 18, horaCierre: 24 },  // Jueves 
+  { dia: 0, horaApertura: 1, horaCierre: 24 },  // Domingo
+  { dia: 1, horaApertura: 1, horaCierre: 24 },  // Lunes 
+  { dia: 2, horaApertura: 1, horaCierre: 24 },  // Martes
+  { dia: 3, horaApertura: 1, horaCierre: 24},  // Miércoles - cerrdado
+  { dia: 4, horaApertura: 1, horaCierre: 24 },  // Jueves 
   { dia: 5, horaApertura: 1, horaCierre: 24 },  // Viernes
-  { dia: 6, horaApertura: 18, horaCierre: 24 },  // Sábado
+  { dia: 6, horaApertura: 1, horaCierre: 24 },  // Sábado
 ];
 
 // FUNCIÓN PARA VERIFICAR SI LA TIENDA ESTÁ ABIERTA

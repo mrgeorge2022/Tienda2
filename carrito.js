@@ -121,7 +121,7 @@ function loadCart() {
         <img src="${imageUrl}" alt="Imagen sin productos" id="carritoimagen">
         <p>No hay productos en tu carrito.</p>
         <button id="volveraproductos" onclick="window.location.href='index.html'">Añadir productos</button>
-`;
+        `;
 
         // Deshabilitar el <select> de opciones de pago si el carrito está vacío
         if (opcionesPago) {
@@ -135,32 +135,64 @@ function loadCart() {
             const subtotal = price * quantity; // Calcular el subtotal del producto
             const imageUrl = product.image || 'img/Productos/default.jpg'; // Imagen alternativa
 
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('cart-item');
-            itemElement.innerHTML = `
-                <div id="contenedordeimagencarrito">
-                    <img src="${imageUrl}" alt="${product.name}" class="cart-product-image"> <!-- Imagen del producto -->
-                </div>
-                <div id="nombre_precio_intrucciones">
-                    <!-- Información del producto -->
-                    <p><strong>${product.name} - $${formatNumber(price)}</strong></p>
-                    <p><strong>Cantidad: </strong>${quantity}</p>
-                    <p><strong>Indicaciones: </strong><span class="instructions-text">${product.instructions || ''}</span></p>
-                </div>
-                
-                <!-- Contenedor de acciones -->
-                <div class="action-container">
-                    <img id="basura" src="img/iconos/basura.png" alt="Eliminar" onclick="removeItem(${index})">
-                    <div class="subtotal-popup">
-                        <p>$${formatNumber(subtotal)}</p>
-                    </div>
-                </div>
+            // Crear una lista de los checkboxes seleccionados en checkboxes
+            const selectedOptions = `
+                ${product.selectedSizes && product.selectedSizes.length > 0 ? `<p><strong>Tamaño:</strong> ${product.selectedSizes.join(', ')}</p>` : ''}
+                ${product.selectedFlavors && product.selectedFlavors.length > 0 ? `<p><strong>Sabor/es:</strong> ${product.selectedFlavors.join(', ')}</p>` : ''}
+                ${product.selectedBorders && product.selectedBorders.length > 0 ? `<p><strong>Borde:</strong> ${product.selectedBorders.join(', ')}</p>` : ''}
+                ${product.selectedAdditionals && product.selectedAdditionals.length > 0 ? `<p><strong>Adicionales:</strong> ${product.selectedAdditionals.join(', ')}</p>` : ''}
+                <p><strong>Indicaciones: </strong><span class="instructions-text">${product.instructions || 'Ninguna'}</span></p>
             `;
-            cartItemsList.appendChild(itemElement);
 
-            // Sumar el subtotal al total general
-            total += subtotal;
-        });
+    // Crear el contenedor del producto
+    const itemElement = document.createElement('div');
+    itemElement.classList.add('cart-item');
+    itemElement.innerHTML = `
+        <div id="contenedordeimagencarrito">
+            <img src="${imageUrl}" alt="${product.name}" class="cart-product-image"> <!-- Imagen del producto -->
+        </div>
+        <div id="nombre_precio_intrucciones">
+            <!-- Información del producto -->
+            <p><strong>${product.name} - $${formatNumber(price)}</strong></p>
+            <p><strong>Cantidad: </strong>${quantity}</p>
+            <p><strong>Indicaciones: </strong><span class="instructions-text">${product.instructions || ''}</span></p>
+        </div>
+        
+        <!-- Contenedor de acciones -->
+        <div class="action-container">
+            <img id="basura" src="img/iconos/basura.png" alt="Eliminar" onclick="removeItem(${index})">
+            <div class="subtotal-popup">
+                <p>$${formatNumber(subtotal)}</p>
+            </div>
+        </div>
+    `;
+
+    // Crear el botón "Ver más detalles"
+    const detailsButton = document.createElement('button');
+    detailsButton.classList.add('toggle-details-btn');
+    detailsButton.innerText = 'Ver más detalles';
+    detailsButton.onclick = function () {
+        toggleDetails(detailsElement, detailsButton);
+    };
+
+    // Crear el contenedor de detalles (inicialmente oculto)
+    const detailsElement = document.createElement('div');
+    detailsElement.classList.add('product-details');
+    detailsElement.style.display = 'none'; // Ocultar por defecto
+    detailsElement.innerHTML = `
+        ${selectedOptions} <!-- Mostrar los checkboxes seleccionados -->
+    `;
+
+    // Agregar el producto al carrito
+    cartItemsList.appendChild(itemElement);
+
+    // Agregar el botón y el contenedor de detalles como hermanos del producto
+    cartItemsList.appendChild(detailsButton);
+    cartItemsList.appendChild(detailsElement);
+
+    // Sumar el subtotal al total general
+    total += subtotal;
+});
 
         // Habilitar el <select> de opciones de pago si el carrito no está vacío
         if (opcionesPago) {
@@ -175,6 +207,15 @@ function loadCart() {
     localStorage.setItem('totalCarrito', total);
 }
 
+function toggleDetails(detailsElement, button) {
+    if (detailsElement.style.display === 'none' || detailsElement.style.display === '') {
+        detailsElement.style.display = 'block'; // Mostrar detalles
+        button.innerText = 'Ver menos detalles'; // Cambiar texto del botón
+    } else {
+        detailsElement.style.display = 'none'; // Ocultar detalles
+        button.innerText = 'Ver más detalles'; // Cambiar texto del botón
+    }
+}
 
 
 // FUNCIÓN PARA ELIMINAR UN PRODUCTO DEL CARRITO
@@ -238,11 +279,17 @@ alert("Tu carrito está vacío. Agrega productos antes de proceder.");
 return; // Evita abrir el modal si el carrito está vacío
 }
 
-// Verificar si no se ha seleccionado un método de pago
-if (!metodoPago) {
-alert("Por favor, selecciona un método de pago antes de continuar.");
-return; // Evita abrir el modal si no se seleccionó un método de pago
-} 
+    // Verificar si no se ha seleccionado un método de pago
+    if (!metodoPago) {
+        alert("Por favor, selecciona un método de pago antes de continuar.");
+        
+        // Resaltar el select de opciones de pago para llamar la atención
+        const opcionesPago = document.getElementById('opcionesPago');
+        opcionesPago.classList.add('highlight-error'); // Agregar clase para resaltar en rojo
+        setTimeout(() => opcionesPago.classList.remove('highlight-error'), 2000); // Eliminar el resaltado después de 2 segundos
+
+        return; // Evita abrir el modal si no se seleccionó un método de pago
+    }
 
 // Si todo está bien, abrir el modal
 document.getElementById('payment-modal').style.display = 'flex'; // Mostrar el modal
@@ -444,11 +491,24 @@ function finalizarCompra() {
 
     const hora = fechaActual.toLocaleTimeString('es-ES', { hour12: false }); // Formato 24 horas
 
-    // Crear el bloque de texto con los productos seleccionados
-    let messageProducts = cartItems.map(item => 
-        `*${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}*` +  // Total de cada producto
-        `\n   _${item.instructions || ''}_`  // Instrucciones del producto
-    ).join('\n');
+
+
+    
+    // Crear el bloque de texto con los productos seleccionados en checkboxes
+    let messageProducts = cartItems.map(item => {
+        const selectedOptions = `
+            ${item.selectedSizes && item.selectedSizes.length > 0 ? `Tamaño: ${item.selectedSizes.join(', ')}` : ''}
+            ${item.selectedFlavors && item.selectedFlavors.length > 0 ? `Sabor/es: ${item.selectedFlavors.join(', ')}` : ''}
+            ${item.selectedBorders && item.selectedBorders.length > 0 ? `Borde: ${item.selectedBorders.join(', ')}` : ''}
+            ${item.selectedAdditionals && item.selectedAdditionals.length > 0 ? `Adicionales: ${item.selectedAdditionals.join(', ')}` : ''}
+        `.trim();
+
+
+
+        return `*${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}*` +
+            `${selectedOptions ? `\n   ${selectedOptions}` : ''}` +
+            `${item.instructions ? `\n   _Instrucciones: ${item.instructions}_` : ''}`;
+    }).join('\n');
 
     // Generar el mensaje de WhatsApp para "Recoger en Tienda"
     let mensaje = "*RECOGER EN TIENDA*\n\n";
@@ -555,36 +615,44 @@ function imprimirFactura() {
 
 
     // Crear el bloque de texto con los productos seleccionados
-    let messageProducts = cartItems.map(item => 
-        `${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}` +  // Total de cada producto
-        `\n _${item.instructions || ''}_`  // Instrucciones del producto
-    ).join('\n');
+    let messageProducts = cartItems.map(item => {
+        const selectedOptions = `
+            ${item.selectedSizes && item.selectedSizes.length > 0 ? `T: ${item.selectedSizes.join(', ')}` : ''}
+            ${item.selectedFlavors && item.selectedFlavors.length > 0 ? `S: ${item.selectedFlavors.join(', ')}` : ''}
+            ${item.selectedBorders && item.selectedBorders.length > 0 ? `B: ${item.selectedBorders.join(', ')}` : ''}
+            ${item.selectedAdditionals && item.selectedAdditionals.length > 0 ? `A: ${item.selectedAdditionals.join(', ')}` : ''}
+        `.trim();
 
+        return `<strong>${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}</strong>` +
+               `${selectedOptions ? `\n   ${selectedOptions.replace(/\n\s+/g, '\n   ')}` : ''}` +
+               `${item.instructions ? `\nInstrucciones:\n${wrapText(item.instructions, 50)}` : ''}`;
+    }).join('\n');
+    
     // Generar el mensaje de la factura con el número de factura
     let facturaTexto = `
 ------------------------------------------------------
-MR. GEORGE - SINCE 2022
+<strong>MR. GEORGE - SINCE 2022</strong>
 ------------------------------------------------------
 
-RECOGER EN TIENDA
+<strong>RECOGER EN TIENDA</strong>
 
-FACTURA Nº: #${numeroFactura}
-FECHA: ${fecha}
-HORA: ${horaCompra}
+<strong>FACTURA Nº:</strong> #${numeroFactura}
+<strong>FECHA:</strong> ${fecha}
+<strong>HORA:</strong> ${horaCompra}
 
-DATOS DEL USUARIO:
-Nombre: ${nombre}
-Teléfono: ${telefono}
+<strong>DATOS DEL USUARIO:</strong>
+<strong>Nombre:</strong> ${nombre}
+<strong>Teléfono:</strong> ${telefono}
 
-PRODUCTOS SELECCIONADOS:
+<strong>PRODUCTOS SELECCIONADOS:</strong>
 
 ${messageProducts}
 
-TOTAL A PAGAR: $${formatNumber(totalProductos)}
-MÉTODO DE PAGO: ${metodoPago}
+<strong>TOTAL A PAGAR:</strong> $${formatNumber(totalProductos)}
+<strong>MÉTODO DE PAGO:</strong> ${metodoPago}
     
 ------------------------------------------------------
-¡Gracias por tu compra!
+<strong>¡Gracias por tu compra!</strong>
 ------------------------------------------------------
 `;
 
@@ -597,6 +665,12 @@ MÉTODO DE PAGO: ${metodoPago}
     ventanaImpresion.print();
 }
 
+
+function wrapText(text, maxLength) {
+    if (!text) return ''; // Manejar casos donde el texto sea null o undefined
+    const regex = new RegExp(`.{1,${maxLength}}`, 'g'); // Divide el texto en bloques de hasta `maxLength` caracteres
+    return text.match(regex).join('\n'); // Une los bloques con saltos de línea
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
