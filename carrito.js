@@ -496,17 +496,17 @@ function finalizarCompra() {
     // Crear el bloque de texto con los productos seleccionados en checkboxes
     let messageProducts = cartItems.map(item => {
         const selectedOptions = `
-            ${item.selectedSizes && item.selectedSizes.length > 0 ? `Tamaño: ${item.selectedSizes.join(', ')}` : ''}
-            ${item.selectedFlavors && item.selectedFlavors.length > 0 ? `Sabor/es: ${item.selectedFlavors.join(', ')}` : ''}
-            ${item.selectedBorders && item.selectedBorders.length > 0 ? `Borde: ${item.selectedBorders.join(', ')}` : ''}
-            ${item.selectedAdditionals && item.selectedAdditionals.length > 0 ? `Adicionales: ${item.selectedAdditionals.join(', ')}` : ''}
+            ${item.selectedSizes && item.selectedSizes.length > 0 ? `T: ${item.selectedSizes.join(', ')}` : ''}
+            ${item.selectedFlavors && item.selectedFlavors.length > 0 ? `S: ${item.selectedFlavors.join(', ')}` : ''}
+            ${item.selectedBorders && item.selectedBorders.length > 0 ? `B: ${item.selectedBorders.join(', ')}` : ''}
+            ${item.selectedAdditionals && item.selectedAdditionals.length > 0 ? `A: ${item.selectedAdditionals.join(', ')}` : ''}
         `.trim();
 
 
 
         return `*${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}*` +
-            `${selectedOptions ? `\n   ${selectedOptions}` : ''}` +
-            `${item.instructions ? `\n   _Instrucciones: ${item.instructions}_` : ''}`;
+            `${selectedOptions ? `\n   ${selectedOptions.replace(/\n\s+/g, '\n   ')}` : ''}` +
+           `${item.instructions ? `\n_Instrucciones: ${item.instructions}_` : '\n__'}`;
     }).join('\n');
 
     // Generar el mensaje de WhatsApp para "Recoger en Tienda"
@@ -624,7 +624,7 @@ function imprimirFactura() {
 
         return `<strong>${item.name} - $${formatNumber(parseFloat(item.price) || 0)} x ${item.quantity} = $${formatNumber(parseFloat(item.price) * item.quantity)}</strong>` +
                `${selectedOptions ? `\n   ${selectedOptions.replace(/\n\s+/g, '\n   ')}` : ''}` +
-               `${item.instructions ? `\nInstrucciones:\n${wrapText(item.instructions, 50)}` : ''}`;
+               `${item.instructions ? `\nInstrucciones: ${wrapText(item.instructions, 38)}` : '\n__'}`;
     }).join('\n');
     
     // Generar el mensaje de la factura con el número de factura
@@ -666,10 +666,35 @@ ${messageProducts}
 
 
 function wrapText(text, maxLength) {
-    if (!text) return ''; // Manejar casos donde el texto sea null o undefined
-    const regex = new RegExp(`.{1,${maxLength}}`, 'g'); // Divide el texto en bloques de hasta `maxLength` caracteres
-    return text.match(regex).join('\n'); // Une los bloques con saltos de línea
+    if (!text) return ''; // Maneja casos donde el texto es null, undefined o vacío
+
+    // Dividimos el texto en palabras usando el espacio como delimitador
+    const words = text.split(' ');
+    let result = '';  // Cadena final con el texto envuelto
+    let line = '';    // Línea actual que se está construyendo
+
+    words.forEach(word => {
+        // Si la palabra es más larga que maxLength, la dividimos en varias líneas
+        while (word.length > maxLength) {
+            result += word.slice(0, maxLength) + '\n'; // Añadimos una parte de la palabra al resultado
+            word = word.slice(maxLength); // Cortamos la palabra para procesar el resto
+        }
+
+        // Comprobamos si añadir la palabra actual excede el límite de longitud
+        if (line.length + word.length + (line.length > 0 ? 1 : 0) > maxLength) {
+            result += line + '\n'; // Añadimos la línea actual al resultado con un salto de línea
+            line = word;           // Comenzamos una nueva línea con la palabra actual
+        } else {
+            // Si no excede el límite, añadimos la palabra a la línea actual
+            line += (line ? ' ' : '') + word;
+        }
+    });
+
+    result += line; // Añadimos la última línea al resultado
+    return result;
 }
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
