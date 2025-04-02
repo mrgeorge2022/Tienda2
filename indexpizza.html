@@ -64,41 +64,35 @@
     </div>
 
 
-    <div id="seccion-navegacion">
-        <button onclick="window.location.href='index.html'">Mr. George Comidas</button>
-        <button onclick="window.location.href='indexpizza.html'">Mr. George Pizzas</button>
-    </div>
 
     <!-- Menú de navegación -->
     <div id="navegadorylista">
         <div class="dropdown-container">
             <a href="#" class="custom-dropdown-toggle" onclick="toggleCategoryDropdown(event)"><span>▼</span></a>
             <ul class="custom-dropdown-menu">
+                <li onclick="window.location.href='index.html'">
+                    <span class="tiendaredirigirlistapizza">Volver a Mr. George</span>
+                </li>
                 <li><a id="recomendadoslist" href="#" onclick="activateCategoryLink('recomendados')">¡Recomendados!</a></li>
                 <li><a href="#" onclick="activateCategoryLink('todos')">Todos</a></li>
-                <li><a href="#" onclick="activateCategoryLink('perros')">Perros</a></li>
-                <li><a href="#" onclick="activateCategoryLink('hamburguesas')">Hamburguesas</a></li>
-                <li><a href="#" onclick="activateCategoryLink('acompañantes')">Acompañantes</a></li>
-                <li><a href="#" onclick="activateCategoryLink('salchipapas')">Salchipapas</a></li>
-                <li><a href="#" onclick="activateCategoryLink('picadas')">Picadas</a></li>
-                <li><a href="#" onclick="activateCategoryLink('bebidas')">Bebidas</a></li>
-                <li><a href="#" onclick="activateCategoryLink('combos')">Combos</a></li>
+                <li><a href="#" onclick="activateCategoryLink('armatupizza')">Armar Mi Pizza</a></li>
+                <li><a href="#" onclick="activateCategoryLink('Gourmet')">Gourmet</a></li>
+                <li><a href="#" onclick="activateCategoryLink('dulces')">Dulces</a></li>
+
             </ul>
         </div>
 
         <nav>
             <ul>
 
-                
-                <li><a id="recomendados" href="#" onclick="displayProducts('recomendados')">¡Recomendados!</a></li>
+                <li onclick="window.location.href='index.html'">
+                   <span class="tiendaredirigirpizzalist">Volver a Mr. George</span>
+                </li>
                 <li><a href="#" onclick="displayProducts('todos')">Todos</a></li>
-                <li><a href="#" onclick="displayProducts('perros')">Perros</a></li>
-                <li><a href="#" onclick="displayProducts('hamburguesas')">Hamburguesas</a></li>
-                <li><a href="#" onclick="displayProducts('acompañantes')">Acompañantes</a></li>
-                <li><a href="#" onclick="displayProducts('salchipapas')">Salchipapas</a></li>
-                <li><a href="#" onclick="displayProducts('picadas')">Picadas</a></li>
-                <li><a href="#" onclick="displayProducts('bebidas')">Bebidas</a></li>
-                <li><a href="#" onclick="displayProducts('combos')">Combos</a></li>
+                <li><a id="recomendadospizza" href="#" onclick="displayProducts('recomendados')">¡Recomendados!</a></li>
+                <li><a href="#" onclick="displayProducts('armatupizza')">Armar Mi Pizza</a></li>
+                <li><a href="#" onclick="displayProducts('Gourmet')">Gourmet</a></li>
+                <li><a href="#" onclick="displayProducts('dulces')">Dulces</a></li>
             </ul>
         </nav>
 

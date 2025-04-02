@@ -443,7 +443,7 @@ header {
 
 #encabezado{
    /*padding-left: 15px;*/
-    margin-top: 60px;
+    margin-top: 10px;
     display: flex;
     width: 100%;
 }
@@ -487,6 +487,53 @@ header h1 {
     .product-item button {
         font-size: 0.9rem;
     }
+}
+
+
+
+/* Estilo para la parte 'Comidas' o 'Pizzas' */
+.tiendaredirigir {
+    color: #ffffff; /* Cambia el color según lo que necesites */
+    font-weight: bold;
+    padding: 6px 20px;
+}
+
+.tiendaredirigirlista{
+    color: #ffc400;
+    padding: 8px 15px;
+    display: block;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilo para la parte 'Comidas' o 'Pizzas' */
+.tiendaredirigirpizzanav {
+    color: #ffc400; /* Cambia el color según lo que necesites */
+    font-weight: bold;
+    padding: 6px 20px;
+    cursor: pointer;
+}
+
+.tiendaredirigirpizzalist{
+    margin-left: 35px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 20px;
+    border-radius: 4px;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tiendaredirigirlistapizza{
+    color: #fff;
+    padding: 8px 15px;
+    display: block;
+    text-decoration: none;
+    font-size: 14px;
+    background-color: #fff2;
 }
 
 
@@ -557,6 +604,9 @@ nav ul li a.active {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Agrega una sombra para mayor énfasis */
 }
 
+
+
+
 /*solo para el li recomendado*/ 
 #recomendados {
     color: #ffc400;
@@ -570,12 +620,32 @@ nav ul li a.active {
 
 #recomendadoslist{
     color: #ffc400;
+    font-weight: bold;
+    font-size: 16px;
 }
 
 #recomendadoslist:hover {
 color: #333;
 }
 
+
+/*solo para el li recomendado pizzas*/ 
+#recomendadospizza {
+    color: #ffc400;
+}
+
+
+#recomendadospizza.active{
+    color: #000000;
+}
+
+#recomendadoslistpizza{
+    color: #ffc400;
+}
+
+#recomendadoslist:hover {
+color: #333;
+}
 
 
 /* Estilo para el contenedor del dropdown fuera del nav */

@@ -137,15 +137,9 @@ document.getElementById("scrollTopButton").addEventListener("click", function ()
 
 // Array de imágenes
 const images = [
-  'anuncios/ILUSTRACION1.jpg',
-  'anuncios/ILUSTRACION2.jpg',
-  'anuncios/ILUSTRACION3.jpg',
-  'anuncios/ILUSTRACION4.jpg',
-  'anuncios/ILUSTRACION6.jpg',
-  'anuncios/ILUSTRACION8.jpg',
-  'anuncios/ILUSTRACION9.jpg',
-  'anuncios/ILUSTRACION10.jpg',
-
+  'anuncios/ILUSTRACION11.jpg',
+  'anuncios/ILUSTRACION12.jpg',
+  'anuncios/ILUSTRACION13.jpg',
 ];
 
 let currentImageIndex = 0;
@@ -284,21 +278,21 @@ function displayProducts(category = '', searchQuery = '') {
       id: 18, 
       image: 'img/productos/armatupizza.jpg', 
       name: 'Arma Tu Pizza', 
-      category: ['todos', 'pizzas'], 
+      category: ['todos', 'armatupizza'], 
       description: '¡Crea tu pizza con los ingredientes que prefieras!' 
     },
     { 
       id: 19, 
       image: 'img/productos/pizzamargarita.jpg', 
       name: 'Pizza Margarita', 
-      category: ['todos', 'pizzas', 'recomendados'], 
+      category: ['todos', 'Gourmet', 'recomendados'], 
       description: '¡La clásica pizza Margarita con queso mozzarella y albahaca fresca!' 
     },
     { 
       id: 20, 
       image: 'img/productos/pizzapepperoni.jpg', 
       name: 'Pizza Pepperoni', 
-      category: ['todos', 'pizzas'], 
+      category: ['todos', 'Dulces'], 
       description: '¡Deliciosa pizza con pepperoni y queso mozzarella!' 
     },
   ];
@@ -428,8 +422,8 @@ function openModal(productId) {
       id: 18,
       image: 'img/productos/armatupizza.jpg',
       name: 'Arma Tu Pizza',
-      category: ['todos', 'pizzas', 'recomendados'],
-      price: 20000,
+      category: ['todos', 'armatupizza'],
+      price: 0,
       description: '¡Crea tu pizza con los ingredientes que prefieras!',
       flavorOptions: [
         { name: 'Jamón', price: 5000 },
@@ -455,8 +449,8 @@ function openModal(productId) {
       id: 19, 
       image: 'img/productos/pizzamargarita.jpg', 
       name: 'Pizza Margarita', 
-      category: ['todos', 'pizzas', 'recomendados'], 
-      price: 20000, 
+      category: ['todos', 'Gourmet', 'recomendados'], 
+      price: 0, 
       description: '¡La tradicional pizza Margarita con queso mozzarella y albahaca fresca!',
       checkboxOptions: [
         { name: 'Borde Queso', price: 10000 },
@@ -473,8 +467,8 @@ function openModal(productId) {
       id: 20, 
       image: 'img/productos/pizzapepperoni.jpg', 
       name: 'Pizza Pepperoni', 
-      category: ['todos', 'pizzas'], 
-      price: 22000, 
+      category: ['todos', 'Dulces'], 
+      price: 0, 
       description: '¡Deliciosa pizza con pepperoni y queso mozzarella!',
       checkboxOptions: [
         { name: 'Extra pepperoni', price: 12000 },

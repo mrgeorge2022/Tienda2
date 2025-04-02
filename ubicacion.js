@@ -907,7 +907,13 @@ COSTO DE DOMICILIO: $${formatNumber(costoDomicilio)}
 MÉTODO DE PAGO: *${metodoPago}*
 
 *Ubicación en Google Maps:*
-${googleMapsLink}`;
+${googleMapsLink}
+
+
+
+*Envía tu pedido aqui ----->*`;
+
+
 
     const encodedMessage = encodeURIComponent(whatsappMessage);
     window.open(`https://wa.me/3022666530?text=${encodedMessage}`, '_blank');

@@ -522,7 +522,8 @@ function finalizarCompra() {
     mensaje += `*TOTAL A PAGAR: $${formatNumber(totalProductos)}*\n`;
     mensaje += `MÉTODO DE PAGO: *${metodoPago}*\n\n`; 
     mensaje += "*Ubicación de la tienda:*\n";
-    mensaje += "https://bit.ly/4f2GU5I\n";
+    mensaje += "https://bit.ly/4f2GU5I\n\n\n";
+    mensaje += "*Envía tu pedido aqui ----->*";
 
     // Codificar el mensaje y abrir WhatsApp
     const encodedMessage = encodeURIComponent(mensaje);

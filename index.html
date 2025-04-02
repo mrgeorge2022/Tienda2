@@ -63,10 +63,6 @@
         <input type="text" id="search-input" placeholder="Buscar..." oninput="searchProducts()">
     </div>
 
-    <div id="seccion-navegacion">
-        <button id="mrcomidas"   onclick="window.location.href='index.html'">Mr. George Comidas</button>
-        <button id="mrpizzas"   onclick="window.location.href='indexpizza.html'">Mr. George Pizzas</button>
-    </div>
 
     
     <!-- Menú de navegación -->
@@ -83,6 +79,9 @@
                 <li><a href="#" onclick="activateCategoryLink('picadas')">Picadas</a></li>
                 <li><a href="#" onclick="activateCategoryLink('bebidas')">Bebidas</a></li>
                 <li><a href="#" onclick="activateCategoryLink('combos')">Combos</a></li>
+                <li onclick="window.location.href='indexpizza.html'">
+                    <span class="tiendaredirigirlista">Ir a Mr. George Pizzas</span>
+                </li>
             </ul>
         </div>
 
@@ -97,6 +96,11 @@
                 <li><a href="#" onclick="displayProducts('picadas')">Picadas</a></li>
                 <li><a href="#" onclick="displayProducts('bebidas')">Bebidas</a></li>
                 <li><a href="#" onclick="displayProducts('combos')">Combos</a></li>
+
+                <li onclick="window.location.href='indexpizza.html'">
+                     <span class="tiendaredirigirpizzanav">Ir a Mr. George Pizzas</span>
+                </li>
+
             </ul>
         </nav>
 
