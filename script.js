@@ -897,7 +897,7 @@ function validateQuantityInput() {
 
 const horariosTienda = [
   { dia: 0, horaApertura: 1, horaCierre: 24 },  // Domingo
-  { dia: 1, horaApertura: 1, horaCierre: 24 },  // Lunes 
+  { dia: 1, horaApertura: null, horaCierre: null },  // Lunes 
   { dia: 2, horaApertura: 1, horaCierre: 24 },  // Martes
   { dia: 3, horaApertura: 1, horaCierre: 24},  // Miércoles - cerrdado
   { dia: 4, horaApertura: 1, horaCierre: 24 },  // Jueves 
