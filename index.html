@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>GLOTO - POS</title>
+  <style>
+    :root {
+      --primary: #00acc1;
+      --primary-dark: #00838f;
+      --primary-light: #e0f7fa;
+      --dark-bg: #263238;
+      --dark-item: #37474f;
+      --border-color: #cfd8dc;
+      --bg-main: #f4f7f9;
+      --text-main: #2c3e50;
+      --text-light: #7f8c8d;
+      --white: #ffffff;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --radius: 12px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset y Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background: var(--bg-main);
+      color: var(--text-main);
+    }
+
+    /* Barra de Navegación Lateral */
+    nav {
+      width: 85px;
+      height: 100vh;
+      background: var(--dark-bg);
+      display: flex;
+      flex-direction: column;
+      padding: 25px 0;
+      border-right: none;
+      flex-shrink: 0;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+      z-index: 20;
+    }
+
+    nav button {
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      color: #90a4ae;
+      border: none;
+      cursor: pointer;
+      font-size: 0.65rem;
+      font-weight: 700;
+      gap: 10px;
+      padding: 20px 0;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    nav button span {
+      font-size: 1.6rem;
+    }
+
+    nav button.active {
+      color: var(--white);
+      background: rgba(0, 172, 193, 0.15);
+    }
+
+    nav button.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 40%;
+      background: var(--primary);
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Contenedor principal de la columna de productos */
+    .productos-container-split {
+      display: flex;
+      flex: 1;
+      /* Toma todo el alto disponible */
+      gap: 15px;
+      /* Espacio entre filtros y productos */
+      overflow: hidden;
+    }
+
+    /* Sidebar de Filtros Verticales */
+    .filtros-verticales-sidebar {
+      width: 140px;
+      /* Ancho fijo para los botones de categorías */
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      padding-right: 5px;
+      flex-shrink: 0;
+      /* No deja que se encoja */
+    }
+
+    /* Ajuste de los botones de categoría para que sean verticales */
+    .btn-cat {
+      width: 100%;
+      padding: 12px 10px;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      white-space: normal;
+      /* Permite que el texto salte de línea si es largo */
+      line-height: 1.2;
+      cursor: pointer;
+    }
+
+    /* Lista de productos con scroll independiente */
+    .lista-productos-grid {
+      flex: 1;
+      /* Ocupa el resto del espacio */
+      display: grid;
+      grid-template-columns: repeat(auto-fill,
+          minmax(150px, 1fr));
+      /* Grid responsivo */
+      gap: 10px;
+      align-content: start;
+    }
+
+    /* Layout y Paneles */
+    .main-layout {
+      display: flex;
+      flex: 1;
+      width: calc(100vw - 85px);
+      /* Resta el ancho exacto de tu NAV */
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Ajuste en los paneles para que NO se desfasen */
+    .panel {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: hidden;
+      background: var(--white);
+      border-right: 1px solid var(--border-color);
+
+      /* CAMBIO CLAVE: Quitamos width fijo y usamos flex-basis */
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    /* Paneles con flex-basis para evitar desbordamiento */
+    #col-contexto {
+      width: 20%;
+      min-width: 200px;
+    }
+
+    #col-productos {
+      flex: 1;
+      min-width: 400px;
+    }
+
+    /* Esta columna se estira */
+    #col-pedido {
+      width: 35%;
+      min-width: 320px;
+      border-right: none;
+    }
+
+    /* Títulos Armónicos */
+    h2 {
+      margin-bottom: 20px;
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    /* Separador (Resizer) */
+    .resizer {
+      width: 4px;
+      cursor: col-resize;
+      background: transparent;
+      flex-shrink: 0;
+      z-index: 15;
+      transition: var(--transition);
+    }
+
+    .resizer:hover,
+    .resizing {
+      background: var(--primary);
+    }
+
+    /* Grid de Mesas */
+    #listaMesas {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 4px;
+      align-content: start;
+    }
+
+    .mesa {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      padding: 18px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .mesa:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .mesa.activa {
+      background: var(--primary) !important;
+      color: var(--white) !important;
+      border-color: var(--primary-dark);
+    }
+
+    .btn-cat.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary-dark);
+    }
+
+    /* Productos */
+    .producto {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      margin-bottom: 10px;
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .producto:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: scale(1.01);
+    }
+
+    /* Pedido Item */
+    .item-pedido {
+      padding: 6px 10px;
+      /* Reducido al mínimo */
+      background: #ffffff;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 2px;
+      /* Espacio casi nulo entre items */
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .item-name {
+      flex: 1;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: #f1f3f4;
+      padding: 2px 2px;
+      border-radius: 20px;
+    }
+
+    /* Totales */
+    .totales-panel {
+      flex-shrink: 0;
+      padding: 5px 10px;
+      /* Padding reducido */
+      background: #f8fafb;
+      border-top: 1px solid var(--border-color);
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fila de Total más pequeña pero impactante */
+    .total-row {
+      font-size: 1.2rem;
+      /* Tamaño más equilibrado */
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+      padding: 5px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    #info-cliente {
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    #info-cliente input {
+      margin-bottom: 0;
+      /* Quitamos márgenes extra */
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    #observacionesInput {
+      height: 35px;
+      /* Altura fija pequeña */
+      min-height: 35px;
+      padding: 6px;
+      font-size: 0.85rem;
+      resize: none;
+    }
+
+    #metodoPagoSelect {
+      padding: 6px;
+      margin-bottom: 4px;
+      font-size: 0.85rem;
+    }
+
+    .acciones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    /* TOAST NOTIFICATIONS CORREGIDOS */
+    #toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast-notification {
+      background: var(--white);
+      color: var(--text-main);
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      border-left: 6px solid var(--primary);
+      animation: slideIn 0.3s ease-out;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .toast-notification.error {
+      border-left-color: #ff5252;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast-notification.hide {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    /* Inputs y botones: estilos faltantes añadidos */
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      background: var(--white);
+      transition: box-shadow 0.15s ease, border-color 0.12s ease,
+        transform 0.06s ease;
+      outline: none;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #9e9e9e;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 8px 22px rgba(0, 172, 193, 0.1);
+    }
+
+    input[disabled],
+    textarea[disabled],
+    select[disabled] {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* Botones base y variantes */
+    button {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.06s ease, filter 0.08s ease,
+        box-shadow 0.12s ease;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:focus {
+      outline: 3px solid rgba(0, 172, 193, 0.12);
+      outline-offset: 3px;
+    }
+
+    button[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      padding: 8px;
+      /* Más estrechos */
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(0.96);
+    }
+
+    .btn-primary:disabled {
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      padding: 8px;
+      /* Más estrechos */
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(0.92);
+    }
+
+    .btn-tipo {
+      padding: 10px 8px;
+      border: 1px solid #e8eaf0;
+      background: var(--white);
+    }
+
+    .btn-tipo.active {
+      transform: scale(1.02);
+      box-shadow: 0 10px 20px rgba(0, 172, 193, 0.08);
+      border-color: var(--primary);
+    }
+
+    .btn-cat {
+      transition: transform 0.08s ease;
+    }
+
+    .btn-cat:hover {
+      transform: translateY(-3px);
+    }
+
+    .btn-qty {
+      width: 25px;
+      /* Botones más pequeños */
+      height: 25px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: var(--primary);
+      color: white;
+    }
+
+    .qty-display {
+      font-size: 0.85rem;
+      font-weight: 800;
+      min-width: 15px;
+      text-align: center;
+    }
+
+    .item-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 80px;
+      justify-content: flex-end;
+    }
+
+    .item-price {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .btn-del-item,
+    .btn-borrar-mesa,
+    .btn-nota {
+      font-size: 1rem;
+      padding: 0;
+      margin: 0;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .btn-del-item:hover,
+    .btn-borrar-mesa:hover,
+    .btn-nota:hover {
+      opacity: 1;
+      color: #e53935;
+    }
+
+    .instruccion-display {
+      font-size: 0.75rem;
+      color: #78909c;
+      background: #fff9c4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border-left: 3px solid #fbc02d;
+      margin-top: 2px;
+    }
+
+    .btn-vaciar-todo {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+      font-weight: 700;
+    }
+
+    .btn-vaciar-todo:hover {
+      filter: brightness(0.98);
+    }
+
+    /* Estilos mejorados para los botones del panel de totales */
+    .acciones {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .acciones .btn-primary {
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 172, 193, 0.12);
+      font-weight: 800;
+      letter-spacing: 0.6px;
+    }
+
+    .acciones .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+
+    .acciones .btn-secondary {
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+      border: 1px solid #e0e6ea;
+      color: var(--text-main);
+      padding: 9px 12px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(46, 60, 67, 0.06);
+      font-weight: 700;
+    }
+
+    .acciones .btn-secondary:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.98);
+    }
+
+    /* Tamaños más grandes para botones clave como "REALIZAR" y "SALDAR" */
+    #btn-realizar-pedido,
+    #btn-saldar-cuenta,
+    #btn-guardar {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+    }
+
+    /* Contenedor de la lista lateral */
+    #listaPedidosActivos {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      /* Espacio entre tarjetas */
+    }
+
+    /* Tarjeta de pedido más limpia */
+    .pedido-item {
+      background: white;
+      border-radius: 10px;
+      padding: 12px 15px;
+      border: 1px solid #f0f2f5;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .pedido-item:hover {
+      background: #f8fafc;
+      border-color: var(--primary);
+    }
+
+    /* Estilo de las etiquetas (Mesa, Domicilio, Recoger) */
+    .etiqueta-servicio {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 50px;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Colores por tipo */
+    .bg-mesa {
+      background-color: #00acc1;
+    }
+
+    /* Azul */
+    .bg-domicilio {
+      background-color: #f39c12;
+    }
+
+    /* Naranja */
+    .bg-recoger {
+      background-color: #8e44ad;
+    }
+
+    /* Morado */
+
+    .monto-pedido {
+      font-weight: 700;
+      color: #2c3e50;
+      font-size: 0.95rem;
+    }
+
+    .nombre-cliente-lista {
+      font-size: 0.85rem;
+      color: #546e7a;
+      display: block;
+    }
+
+    /* Definición del movimiento de rotación */
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Opcional: Asegúrate de que la clase hidden funcione bien con flex */
+    #loader-global.hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loader-global" class="hidden" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      ">
+    <div style="
+          width: 50px;
+          height: 50px;
+          border: 5px solid #f3f3f3;
+          border-top: 5px solid #00acc1;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        "></div>
+  </div>
+
+  <nav>
+    <button id="nav-nuevo" onclick="cambiarModulo('nuevo')" class="active">
+      <span>➕</span> NUEVO
+    </button>
+    <button id="nav-mesas" onclick="cambiarModulo('mesas')">
+      <span>🪑</span> MESAS
+    </button>
+    <button id="nav-gestion" onclick="cambiarModulo('gestion')">
+      <span>📦</span> PEDIDOS
+    </button>
+  </nav>
+
+  <div class="main-layout">
+    <div id="col-contexto" class="panel">
+      <div id="modulo-nuevo-sidebar">
+        <h2>Servicio</h2>
+        <div class="tipo-selector" style="display: flex; flex-direction: column; gap: 10px">
+          <button class="btn-tipo" onclick="setTipoServicio('Mesa')" id="btn-mesa">
+            Mesa
+          </button>
+          <button class="btn-tipo" onclick="setTipoServicio('Recoger en tienda')" id="btn-recoger">
+            Recoger
+          </button>
+          <button class="btn-tipo" onclick="setTipoServicio('Domicilio')" id="btn-domi">
+            Domicilio
+          </button>
+        </div>
+      </div>
+
+      <div id="modulo-mesas-sidebar" class="hidden">
+        <h2>Mapa de Mesas</h2>
+        <div id="listaMesas" class="scroll-area"></div>
+      </div>
+
+      <div id="modulo-pedidos-sidebar" class="sidebar hidden">
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-color);">
+          <h2 style="margin-bottom: 12px;">Pedidos</h2>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <input type="text" id="buscadorPedidosReal" placeholder="🔍 Buscar factura o nombre..."
+              oninput="renderPedidosList()"
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+
+            <select id="filtroTipoEntrega" onchange="renderPedidosList()"
+              style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: white;">
+              <option value="">Todo</option>
+              <option value="mesa">Mesa</option>
+              <option value="domi">Domicilio</option>
+              <option value="reco">Recoger</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="listaPedidosActivos" class="scroll-area"></div>
+      </div>
+    </div>
+
+    <div class="resizer"></div>
+
+    <div id="col-productos" class="panel">
+      <h2>Catálogo</h2>
+
+      <input type="text" id="buscadorProd" placeholder="🔍 Buscar producto..." oninput="filtrarProductos()"
+        style="margin-bottom: 15px" />
+
+      <div class="productos-container-split">
+        <div id="categoriasTabs" class="filtros-verticales-sidebar"></div>
+
+        <div id="listaProductos" class="scroll-area lista-productos-grid"></div>
+      </div>
+    </div>
+
+    <div class="resizer"></div>
+
+    <div id="col-pedido" class="panel">
+      <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00acc1;
+            padding-bottom: 8px;
+          ">
+        <h2 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0">
+          Detalle Pedido
+        </h2>
+        <div id="contenedorVaciar"></div>
+      </div>
+
+      <div id="estadoVacio" class="empty-state" style="text-align: center; color: #999; margin-top: 50px">
+        <span style="font-size: 3rem">🛍️</span><br />Selecciona un tipo de
+        servicio
+      </div>
+
+      <div id="contenidoPedido" class="hidden" style="
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+          ">
+        <div id="pedido" class="scroll-area"></div>
+
+        <div class="totales-panel">
+          <div id="info-cliente" class="hidden">
+            <div id="contenedor-editar-mesa" class="hidden" style="
+                  margin-bottom: 10px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                ">
+              <span style="font-weight: bold; color: var(--primary)">MESA #</span>
+              <input type="number" id="clienteMesaEdicion" min="1" style="width: 80px"
+                oninput="validarMesaPositiva(this)" />
+            </div>
+            <input type="text" id="clienteNombre" placeholder="Nombre del cliente" style="margin-bottom: 8px" />
+            <input type="text" id="clienteTelefono" placeholder="Teléfono" style="margin-bottom: 8px"
+              oninput="sanitizeTelefono(this)" />
+          </div>
+
+          <div class="total-row">
+            <span>TOTAL</span>
+            <span id="totalPagar" style="color: var(--primary-dark)">$0</span>
+          </div>
+
+          <textarea id="observacionesInput" rows="2" placeholder="Notas especiales del pedido..."
+            style="margin-bottom: 10px"></textarea>
+          <select id="metodoPagoSelect" style="margin-bottom: 15px"></select>
+
+          <div class="acciones" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+            <button id="btn-realizar-pedido" class="btn-primary hidden" onclick="procesarGuardado()">
+              REALIZAR PEDIDO
+            </button>
+
+            <button id="btn-saldar-cuenta" class="btn-primary hidden" onclick="cerrarMesa()"
+              style="background:#00acc1; color:#fff">
+              CERRAR CUENTA
+            </button>
+
+            <button id="btn-actualizar-mesa" class="btn-secondary hidden" onclick="actualizarPedidoActual()"
+              style="background:#cfd8dc; color:#546e7a">
+              ACTUALIZAR MESA
+            </button>
+
+            <button id="btn-actualizar-pedido" class="btn-secondary hidden" onclick="actualizarPedidoActual()"
+              style="background:#cfd8dc; color:#546e7a">
+              ACTUALIZAR PEDIDO
+            </button>
+
+            <button id="btn-guardar" class="btn-primary hidden" onclick="procesarGuardado()">
+              GUARDAR
+            </button>
+
+            <button id="btn-cerrar" class="btn-secondary hidden" onclick="cerrarMesa()"
+              style="background: #cfd8dc; color: #546e7a">
+              CERRAR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script>
+    // ========================================
+    // CONFIGURACIÓN Y CONSTANTES
+    // ========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbwz1qLja77eEsUfvIfTEPA0X_YiyCCmLLsulqKXnpCBFybrd39qKYCIrwXqYqXBvRs/exec";
+    const METODOS_PAGO = ["Efectivo", "Transferencia", "Efectivo/Transferencia"];
+    const MIN_PANEL_WIDTH = 100;
+    const MAX_PANEL_WIDTH = 1200;
+    const SYNC_INTERVAL = 5000; // 5 segundos
+
+    // ========================================
+    // ESTADO GLOBAL
+    // ========================================
+    // Datos del servidor
+    let mesas = [];
+    let productos = [];
+    let categorias = ["Todos"];
+    let pedidosGeneral = [];
+
+    // Estado de UI y contexto
+    let mesaActiva = null;
+    let pedido = [];
+    let catActiva = "Todos";
+    let editandoIndex = null;
+    let tipoServicioActual = null;
+    let currentModulo = "nuevo";
+    let pedidoModificado = false;
+
+    // Estado de sincronización
+    let estaEscribiendo = false;
+    let pestañaActiva = true;
+
+
+    // ========================================
+    // FUNCIONES DE FORMATO
+    // ========================================
+    // Formato: $35,000 (Sin decimales)
+    function formatearParaProductos(v) {
+      return "$" + Math.round(v).toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+    }
+
+    // Formato: $35,000.00 (Con decimales)
+    function formatearParaPagar(v) {
+      return "$" + Number(v).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    // ========================================
+    // VALIDACIÓN Y SANITIZACIÓN
+    // ========================================
+    function sanitizeTelefono(el) {
+      let v = el.value || "";
+      v = v.replace(/[^+\d]/g, "");
+      if (v.indexOf("+") > 0) {
+        v = v.replace(/\+/g, "").replace(/\D/g, "");
+      } else if (v.indexOf("+") === 0) {
+        v = "+" + v.slice(1).replace(/\D/g, "");
+      } else {
+        v = v.replace(/\D/g, "");
+      }
+      el.value = v;
+    }
+
+    function validarMesaPositiva(el) {
+      if (el.value !== "" && el.value < 1) {
+        el.value = "";
+      }
+    }
+
+    // ========================================
+    // FUNCIONES DE UI - LOADER Y NOTIFICACIONES
+    // ========================================
+    function mostrarLoader() {
+      document.getElementById("loader-global").classList.remove("hidden");
+    }
+
+    function ocultarLoader() {
+      document.getElementById("loader-global").classList.add("hidden");
+    }
+
+    function mostrarLoaderColumna(idContenedor, mensaje = "Cargando...") {
+      const container = document.getElementById(idContenedor);
+      if (!container) return;
+      container.innerHTML = `<div class="column-loader"><div class="spinner-small"></div><div>${mensaje}</div></div>`;
+    }
+
+    function notificar(mensaje, tipo = "success") {
+      let cont = document.getElementById("toast-container");
+      if (!cont) {
+        cont = document.createElement("div");
+        cont.id = "toast-container";
+        document.body.appendChild(cont);
+      }
+      const toast = document.createElement("div");
+      toast.className = "toast-notification" + (tipo === "error" ? " error" : "");
+      toast.innerHTML = `<span>${tipo === "success" ? "✅" : "❌"}</span><span>${mensaje}</span>`;
+      cont.appendChild(toast);
+      setTimeout(() => toast.classList.add("hide"), 3000);
+      setTimeout(() => toast.remove(), 3600);
+    }
+
+    function notificarConfirm(mensaje, opciones = { yesText: "Sí", noText: "No" }) {
+      return new Promise((resolve) => {
+        let cont = document.getElementById("toast-container");
+        if (!cont) {
+          cont = document.createElement("div");
+          cont.id = "toast-container";
+          document.body.appendChild(cont);
+        }
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.style.minWidth = "340px";
+        toast.innerHTML = `
+          <div style="flex:1"><div style="font-weight:700; margin-bottom:6px;">${mensaje}</div></div>
+          <div style="display:flex; gap:8px; margin-left:8px;">
+            <button id="toast-yes" style="background:#00acc1; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer">${opciones.yesText}</button>
+            <button id="toast-no" style="background:#eee; color:#333; border:none; padding:6px 10px; border-radius:6px; cursor:pointer">${opciones.noText}</button>
+          </div>`;
+        cont.appendChild(toast);
+        const btnYes = toast.querySelector("#toast-yes");
+        const btnNo = toast.querySelector("#toast-no");
+        const limpiar = () => toast.remove();
+        btnYes.addEventListener("click", () => { limpiar(); resolve(true); });
+        btnNo.addEventListener("click", () => { limpiar(); resolve(false); });
+      });
+    }
+
+    // ========================================
+    // FUNCIONES AUXILIARES
+    // ========================================
+    function generarIDFactura(nombre, telefono) {
+      const nom = (nombre || "X").substring(0, 3).toUpperCase();
+      const tel = (telefono || "000").slice(-3);
+      const now = new Date();
+      const añoCorto = now.getFullYear().toString().slice(-2);
+      const fechaStr = añoCorto + (now.getMonth() + 1).toString().padStart(2, "0") + now.getDate().toString().padStart(2, "0");
+      const horaStr = now.getHours().toString().padStart(2, "0") + now.getMinutes().toString().padStart(2, "0") + now.getSeconds().toString().padStart(2, "0");
+      return `#${nom}${tel}${fechaStr}${horaStr}`;
+    }
+
+    function parseProductos(t) {
+      if (!t) return [];
+      return t.split("\n").map((item) => {
+        const m = item.match(/(.+?) x(\d+) - \$([0-9.]+)(?:\s*\((.*)\))?/);
+        if (!m) return null;
+        const precioNumerico = parseInt(m[3].replace(/\./g, ""));
+        return {
+          nombre: m[1].trim(),
+          cantidad: parseInt(m[2]),
+          precio: precioNumerico / parseInt(m[2]),
+          totalPrecio: precioNumerico,
+          instruccion: m[4] || "",
+        };
+      }).filter(Boolean);
+    }
+
+    function limpiarInterfazPedido() {
+      document.getElementById("clienteNombre").value = "";
+      document.getElementById("clienteTelefono").value = "";
+      document.getElementById("clienteMesaEdicion").value = "";
+      document.getElementById("observacionesInput").value = "";
+      pedido = [];
+      mesaActiva = null;
+      pedidoModificado = false;
+      renderPedido();
+    }
+
+    function limpiarCamposCliente() {
+      document.getElementById("clienteNombre").value = "";
+      document.getElementById("clienteTelefono").value = "";
+      document.getElementById("observacionesInput").value = "";
+      document.getElementById("clienteMesaEdicion").value = "";
+    }
+
+    // ========================================
+    // FUNCIONES DE NAVEGACIÓN Y MODULOS
+    // ========================================
+    function cambiarModulo(mod) {
+      const isNuevo = mod === "nuevo";
+      const isMesas = mod === "mesas";
+      const isGestion = mod === "gestion";
+      currentModulo = mod;
+
+      // Actualizar estados de botones nav
+      ["nav-nuevo", "nav-mesas", "nav-gestion"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.toggle("active",
+          (id === "nav-nuevo" && isNuevo) ||
+          (id === "nav-mesas" && isMesas) ||
+          (id === "nav-gestion" && isGestion)
+        );
+      });
+
+      // Visibilidad de sidebars
+      const sidebarNuevo = document.getElementById("modulo-nuevo-sidebar");
+      const sidebarMesas = document.getElementById("modulo-mesas-sidebar");
+      const sidebarPedidos = document.getElementById("modulo-pedidos-sidebar");
+
+      if (isGestion) {
+        if (sidebarNuevo) sidebarNuevo.classList.add("hidden");
+        if (sidebarMesas) sidebarMesas.classList.add("hidden");
+        if (sidebarPedidos) {
+          sidebarPedidos.classList.remove("hidden");
+          mostrarLoaderColumna("listaPedidosActivos", "Cargando pedidos...");
+          fetchPedidos();
+        }
+      } else if (isMesas) {
+        if (sidebarNuevo) sidebarNuevo.classList.add("hidden");
+        if (sidebarPedidos) sidebarPedidos.classList.add("hidden");
+        if (sidebarMesas) {
+          sidebarMesas.classList.remove("hidden");
+          mostrarLoaderColumna("listaMesas", "Cargando salón...");
+          fetchMesas();
+        }
+      } else {
+        if (sidebarMesas) sidebarMesas.classList.add("hidden");
+        if (sidebarPedidos) sidebarPedidos.classList.add("hidden");
+        if (sidebarNuevo) sidebarNuevo.classList.remove("hidden");
+      }
+
+      // Resetear detalles
+      pedido = [];
+      mesaActiva = null;
+      editandoIndex = -1;
+      limpiarCamposCliente();
+      tipoServicioActual = null;
+      // Limpiar visualmente los botones de servicio
+      document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+      // Asegurar que el método de pago quede deseleccionado al cambiar de módulo
+      try {
+        actualizarMetodosPago("");
+      } catch (e) {
+        const sel = document.getElementById("metodoPagoSelect");
+        if (sel) sel.value = "";
+      }
+
+      const contenidoPedido = document.getElementById('contenidoPedido');
+      const estadoVacio = document.getElementById('estadoVacio');
+      const infoCliente = document.getElementById('info-cliente');
+
+      if (contenidoPedido) contenidoPedido.classList.add('hidden');
+      if (estadoVacio) estadoVacio.classList.remove('hidden');
+      if (infoCliente) infoCliente.classList.add('hidden');
+
+      if (typeof renderPedido === "function") renderPedido();
+      document.querySelectorAll(".scroll-area, .panel").forEach((el) => (el.scrollTop = 0));
+      if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+    }
+
+    function setTipoServicio(tipo) {
+      if (tipoServicioActual === tipo) {
+        tipoServicioActual = null;
+        document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+        document.getElementById("info-cliente").classList.add("hidden");
+        document.getElementById("contenidoPedido").classList.add("hidden");
+        document.getElementById("estadoVacio").classList.remove("hidden");
+        limpiarCamposCliente();
+        actualizarMetodosPago("");
+        mesaActiva = null;
+        pedido = [];
+        renderPedido();
+        return;
+      }
+
+      tipoServicioActual = tipo;
+      document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+
+      if (tipo === "Mesa") document.getElementById("btn-mesa").classList.add("active");
+      else if (tipo === "Domicilio") document.getElementById("btn-domi").classList.add("active");
+      else if (tipo === "Recoger en tienda") document.getElementById("btn-recoger").classList.add("active");
+
+      document.getElementById("info-cliente").classList.remove("hidden");
+      document.getElementById("contenidoPedido").classList.remove("hidden");
+      document.getElementById("estadoVacio").classList.add("hidden");
+
+      const contenedorMesa = document.getElementById("contenedor-editar-mesa");
+      if (tipo === "Mesa") {
+        contenedorMesa.classList.remove("hidden");
+      } else {
+        contenedorMesa.classList.add("hidden");
+      }
+
+      mesaActiva = {
+        ...mesaActiva,
+        numeroFactura: mesaActiva?.numeroFactura || "TEMP",
+        mesa: tipo === "Mesa" ? document.getElementById("clienteMesaEdicion").value || "" : tipo,
+      };
+
+      renderPedido();
+      pedidoModificado = false;
+      if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+    }
+
+    // ========================================
+    // FUNCIONES DE API Y DATOS
+    // ========================================
+    async function fetchMesas() {
+      if (mesas.length === 0) mostrarLoaderColumna("listaMesas", "");
+      try {
+        const res = await fetch(API_URL + "?action=mesas.get");
+        const data = await res.json();
+        mesas = data.resultados || [];
+        renderMesas();
+      } catch (error) {
+        console.error("Error:", error);
+        notificar("Ocurrió un error, inténtalo de nuevo", "error");
+      }
+    }
+
+    async function fetchProductos() {
+      const res = await fetch(API_URL + "?action=productos.get");
+      const data = await res.json();
+      productos = data.productos || [];
+      const cats = new Set(["Todos"]);
+      productos.forEach((p) => {
+        if (p.categoria) cats.add(p.categoria);
+      });
+      categorias = Array.from(cats);
+      renderCategorias();
+      renderProductos();
+    }
+
+    async function fetchPedidos() {
+      mostrarLoaderColumna("listaPedidosActivos", "Buscando pedidos...");
+      try {
+        const res = await fetch(API_URL + "?action=pedidos.get");
+        const data = await res.json();
+        pedidosGeneral = data.pedidos || [];
+        renderPedidosList();
+      } catch (error) {
+        notificar("No se pudo cargar la lista, inténtalo de nuevo", "error");
+      }
+    }
+
+    function actualizarMetodosPago(val) {
+      const s = document.getElementById("metodoPagoSelect");
+      s.innerHTML = `<option value="">Método de pago</option>` +
+        METODOS_PAGO.map(m => `<option value="${m}" ${m === val ? "selected" : ""}>${m}</option>`).join("");
+    }
+    // ========================================
+    // FUNCIONES DE RENDERIZADO - PEDIDOS
+    // ========================================
+    function renderPedidosList() {
+      const container = document.getElementById("listaPedidosActivos");
+      if (!container) return;
+
+      const filtroTexto = document.getElementById("buscadorPedidosReal")?.value.toLowerCase() || "";
+      const filtroTipo = document.getElementById("filtroTipoEntrega")?.value.toLowerCase() || "";
+      container.innerHTML = "";
+
+      const items = (pedidosGeneral || []).filter(p => {
+        const nombre = (p["nombre"] || "").toLowerCase();
+        const factura = (p["numeroFactura"] || "").toString().toLowerCase();
+        const tipoDB = (p["tipoEntrega"] || "").toLowerCase();
+        const coincideTexto = nombre.includes(filtroTexto) || factura.includes(filtroTexto);
+        const coincideTipo = filtroTipo === "" || tipoDB.includes(filtroTipo);
+        return coincideTexto && coincideTipo;
+      }).reverse();
+
+      if (items.length === 0) {
+        container.innerHTML = "<p style='padding:20px; text-align:center; color:#999;'>No hay pedidos con esos filtros.</p>";
+        return;
+      }
+
+      items.forEach((p) => {
+        const div = document.createElement("div");
+        div.className = "pedido-item";
+        div.onclick = () => seleccionarPedido(p);
+
+        let textoServicio = "MESA", claseColor = "bg-mesa";
+        const tipoDB = (p["tipoEntrega"] || "").toLowerCase();
+        if (tipoDB.includes("domi")) { textoServicio = "DOMICILIO"; claseColor = "bg-domicilio"; }
+        else if (tipoDB.includes("reco") || tipoDB.includes("local")) { textoServicio = "RECOGER"; claseColor = "bg-recoger"; }
+
+        div.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+              <small style="color: #999; font-weight: bold; font-family: monospace;">${p["numeroFactura"]}</small>
+              <span class="monto-pedido">$${Number(p["totalPagar"]).toLocaleString()}</span>
+            </div>
+            <strong class="nombre-cliente-lista">${p["nombre"] || "Sin nombre"}</strong>
+            <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span class="etiqueta-servicio ${claseColor}">${textoServicio}</span>
+              <span style="font-size: 0.7rem; color: #bbb;">${p["hora"] || ""}</span>
+            </div>
+          </div>
+          <button class="btn-del-item" onclick="event.stopPropagation(); eliminarPedidoGeneral(${p.rowIndex})" style="margin-left: 10px; opacity: 0.4;">🗑</button>`;
+        container.appendChild(div);
+      });
+    }
+
+    function seleccionarPedido(p) {
+      mesaActiva = { ...p };
+      pedido = parseProductos(p.productos || "");
+      tipoServicioActual = p.tipoEntrega;
+
+      document.getElementById("estadoVacio").classList.add("hidden");
+      document.getElementById("contenidoPedido").classList.remove("hidden");
+      document.getElementById("clienteNombre").value = p.nombre || "";
+      document.getElementById("clienteTelefono").value = p.telefono || "";
+      document.getElementById("observacionesInput").value = p.observaciones || "";
+      actualizarMetodosPago(p.metodoPago || "");
+
+      if (p.tipoEntrega === "Mesa") {
+        document.getElementById("contenedor-editar-mesa").classList.remove("hidden");
+        document.getElementById("clienteMesaEdicion").value = p.mesa || "";
+      } else {
+        document.getElementById("contenedor-editar-mesa").classList.add("hidden");
+      }
+
+      document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+      if (p.tipoEntrega === "Mesa") document.getElementById("btn-mesa")?.classList.add("active");
+      else if (p.tipoEntrega === "Domicilio") document.getElementById("btn-domi")?.classList.add("active");
+      else if (p.tipoEntrega === "Recoger en tienda") document.getElementById("btn-recoger")?.classList.add("active");
+
+      document.getElementById("info-cliente").classList.remove("hidden");
+      renderMesas();
+      renderPedido();
+      pedidoModificado = false;
+      if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+    }
+
+    // ========================================
+    // FUNCIONES DE RENDERIZADO - MESAS
+    // ========================================
+    function renderMesas() {
+      if (currentModulo === "gestion") return;
+      const container = document.getElementById("listaMesas");
+      container.innerHTML = "";
+      const mesasOrdenadas = [...mesas].sort((a, b) => parseInt(a.mesa) - parseInt(b.mesa));
+
+      mesasOrdenadas.forEach((m) => {
+        const div = document.createElement("div");
+        const esActiva = mesaActiva && mesaActiva.numeroFactura === m.numeroFactura;
+        div.className = "mesa" + (esActiva ? " activa" : "");
+        div.onclick = () => seleccionarMesa(m);
+        div.innerHTML = `
+          <div style="flex:1">
+            <strong>Mesa ${m.mesa}</strong><br>
+            <small>${m.nombre || "Sin nombre"}</small>
+          </div>
+          <button class="btn-borrar-mesa" onclick="eliminarMesa(${m.rowIndex}, event)">🗑</button>`;
+        container.appendChild(div);
+      });
+    }
+
+    function seleccionarMesa(m) {
+      if (mesaActiva && mesaActiva.numeroFactura === m.numeroFactura) {
+        mesaActiva = null;
+        pedido = [];
+        document.getElementById("contenidoPedido").classList.add("hidden");
+        document.getElementById("estadoVacio").classList.remove("hidden");
+        document.getElementById("contenedor-editar-mesa").classList.add("hidden");
+        limpiarCamposCliente();
+        actualizarMetodosPago("");
+        tipoServicioActual = null;
+        document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+        document.getElementById("info-cliente").classList.add("hidden");
+        renderPedido();
+      } else {
+        mesaActiva = m;
+        pedido = parseProductos(m.productos || "");
+        // Asegurar que el contexto de servicio sea 'Mesa' cuando se selecciona una mesa
+        tipoServicioActual = "Mesa";
+        document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+        document.getElementById("btn-mesa")?.classList.add("active");
+        document.getElementById("estadoVacio").classList.add("hidden");
+        document.getElementById("contenidoPedido").classList.remove("hidden");
+        document.getElementById("contenedor-editar-mesa").classList.remove("hidden");
+        document.getElementById("clienteMesaEdicion").value = m.mesa || "";
+        document.getElementById("clienteNombre").value = m.nombre || "";
+        document.getElementById("clienteTelefono").value = m.telefono || "";
+        document.getElementById("observacionesInput").value = m.observaciones || "";
+        actualizarMetodosPago(m.metodoPago);
+        document.getElementById("info-cliente").classList.remove("hidden");
+      }
+      renderMesas();
+      renderPedido();
+      pedidoModificado = false;
+      if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+    }
+
+    // ========================================
+    // FUNCIONES DE RENDERIZADO - CATEGORÍAS Y PRODUCTOS
+    // ========================================
+    function renderCategorias() {
+      const container = document.getElementById("categoriasTabs");
+      container.innerHTML = "";
+      categorias.forEach((cat) => {
+        const div = document.createElement("div");
+        div.className = "btn-cat" + (catActiva === cat ? " active" : "");
+        div.textContent = cat;
+        div.onclick = () => {
+          catActiva = cat;
+          renderCategorias();
+          filtrarProductos();
+        };
+        container.appendChild(div);
+      });
+    }
+
+    function filtrarProductos() {
+      const term = document.getElementById("buscadorProd").value.toLowerCase();
+      const filtrados = productos.filter((p) =>
+        (catActiva === "Todos" || p.categoria === catActiva) &&
+        p.nombre.toLowerCase().includes(term)
+      );
+      renderProductos(filtrados);
+    }
+
+    function renderProductos(lista = productos) {
+      const container = document.getElementById("listaProductos");
+      container.innerHTML = "";
+      lista.forEach((p) => {
+        const div = document.createElement("div");
+        div.className = "producto";
+        div.innerHTML = `<strong>${p.nombre}</strong><br><small>${formatearParaProductos(p.precio)}</small>`;
+        div.onclick = () => addProducto(p);
+        container.appendChild(div);
+      });
+    }
+
+    function addProducto(p) {
+      if (!mesaActiva) {
+        notificar("Selecciona servicio", "error");
+        return;
+      }
+      const existe = pedido.find((i) => i.nombre === p.nombre && !i.instruccion);
+      if (existe) {
+        existe.cantidad++;
+        existe.totalPrecio = existe.cantidad * existe.precio;
+      } else {
+        pedido.push({
+          nombre: p.nombre,
+          cantidad: 1,
+          precio: p.precio,
+          totalPrecio: p.precio,
+          instruccion: "",
+        });
+      }
+      pedidoModificado = true;
+      renderPedido();
+      document.getElementById("pedido").scrollTo({ top: 9999, behavior: "smooth" });
+    }
+
+    // ========================================
+    // FUNCIONES DE RENDERIZADO - CARRITO PEDIDO
+    // ========================================
+    function renderPedido() {
+      const container = document.getElementById("pedido");
+      const contenedorVaciar = document.getElementById("contenedorVaciar");
+      container.innerHTML = "";
+      contenedorVaciar.innerHTML = "";
+      let total = 0;
+
+      if (pedido.length > 0) {
+        contenedorVaciar.innerHTML = `<button class="btn-vaciar-todo" onclick="vaciarPedidoCompleto()">🗑️ Vaciar</button>`;
+      }
+
+      pedido.forEach((p, i) => {
+        const div = document.createElement("div");
+        div.className = "item-pedido";
+        const esEditando = editandoIndex === i;
+
+        div.innerHTML = `
+          <div class="item-main">
+            <div style="flex:1; display:flex; align-items:center; gap:5px; overflow:hidden;">
+              <strong class="item-name" title="${p.nombre}">${p.nombre}</strong>
+              <button class="btn-nota" onclick="habilitarEdicionNota(${i})" style="font-size:0.8rem; opacity:0.7;">✎</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="item-price" style="font-size:0.85rem; font-weight:700;">$${p.totalPrecio.toLocaleString()}</span>
+              <div class="item-controls">
+                <button class="btn-qty" onclick="cambiarCant(${i},-1)">-</button>
+                <b style="min-width:18px; text-align:center; font-size:0.85rem;">${p.cantidad}</b>
+                <button class="btn-qty" onclick="cambiarCant(${i},1)">+</button>
+              </div>
+              <button class="btn-del-item" onclick="eliminarProductoDirecto(${i})" style="background:none; border:none; color:#ff5252; cursor:pointer; padding:0 5px;">🗑</button>
+            </div>
+          </div>
+          ${p.instruccion && !esEditando ? `<span class="instruccion-display">${p.instruccion}</span>` : ""}
+          ${esEditando ? `<input type="text" id="input-nota-${i}" class="input-nota-inline" value="${p.instruccion}" placeholder="Escribe una nota..." style="width:100%; margin-top:5px; padding:4px 8px; font-size:0.8rem; border:1px solid var(--primary); border-radius:4px;" onkeydown="if(event.key==='Enter') guardarNotaInline(${i}, this.value)" onblur="guardarNotaInline(${i}, this.value)">` : ""}`;
+        container.appendChild(div);
+        total += p.totalPrecio;
+      });
+
+      document.getElementById("totalPagar").textContent = formatearParaPagar(total);
+      if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+    }
+
+    function habilitarEdicionNota(i) {
+      editandoIndex = i;
+      renderPedido();
+      setTimeout(() => document.getElementById(`input-nota-${i}`).focus(), 50);
+    }
+
+    function guardarNotaInline(i, valor) {
+      pedido[i].instruccion = valor.trim();
+      editandoIndex = null;
+      pedidoModificado = true;
+      renderPedido();
+    }
+
+    async function cambiarCant(i, d) {
+      const nuevaCantidad = pedido[i].cantidad + d;
+      if (nuevaCantidad === 0) {
+        if (await notificarConfirm(`¿Quitar ${pedido[i].nombre} del pedido?`)) {
+          pedido.splice(i, 1);
+        }
+      } else if (nuevaCantidad > 0) {
+        pedido[i].cantidad = nuevaCantidad;
+        pedido[i].totalPrecio = pedido[i].cantidad * pedido[i].precio;
+      }
+      pedidoModificado = true;
+      renderPedido();
+    }
+
+    async function eliminarProductoDirecto(index) {
+      if (await notificarConfirm(`¿Quitar ${pedido[index].nombre} del pedido?`)) {
+        pedido.splice(index, 1);
+        pedidoModificado = true;
+        renderPedido();
+      }
+    }
+
+    function vaciarPedidoCompleto() {
+      if (confirm("¿Estás seguro de que quieres borrar todo el pedido actual?")) {
+        pedido = [];
+        tipoServicio = null;
+        pedidoModificado = true;
+        renderPedido();
+        document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+      }
+    }
+
+    // ========================================
+    // FUNCIONES DE GUARDAR Y ACTUALIZAR
+    // ========================================
+    async function procesarGuardado() {
+      if (!mesaActiva || pedido.length === 0) {
+        notificar("El pedido está vacío", "error");
+        return false;
+      }
+
+      const nombreInput = document.getElementById("clienteNombre").value.trim();
+      const telefonoInput = document.getElementById("clienteTelefono").value.trim();
+
+      if (nombreInput === "") {
+        notificar("¡Atención! El Nombre del cliente es requerido", "error");
+        document.getElementById("clienteNombre").focus();
+        return false;
+      }
+
+      if (telefonoInput === "") {
+        notificar("¡Atención! El Teléfono es requerido", "error");
+        document.getElementById("clienteTelefono").focus();
+        return false;
+      }
+
+      const esMesa = tipoServicioActual === "Mesa";
+      let numeroDeMesa = document.getElementById("clienteMesaEdicion").value;
+
+      if (esMesa && (!numeroDeMesa || numeroDeMesa <= 0)) {
+        notificar("Ingrese un número de mesa válido", "error");
+        return false;
+      }
+
+      const nombreCliente = nombreInput;
+      const telCliente = telefonoInput;
+      const metodoSeleccionado = document.getElementById("metodoPagoSelect").value;
+      const observaciones = document.getElementById("observacionesInput").value || "";
+
+      if (!metodoSeleccionado) {
+        notificar("Seleccione un método de pago", "error");
+        return false;
+      }
+
+      const facturaID = mesaActiva && mesaActiva.numeroFactura && mesaActiva.numeroFactura !== "TEMP"
+        ? mesaActiva.numeroFactura
+        : generarIDFactura(nombreCliente, telCliente);
+
+      const sumaProductosNum = pedido.reduce((a, b) => a + b.totalPrecio, 0);
+      const prodTexto = pedido.map(p => `${p.nombre} x${p.cantidad} - $${Math.round(p.totalPrecio)}${p.instruccion ? ` (${p.instruccion})` : ""}`).join("\n");
+
+      const datosBase = {
+        numeroFactura: facturaID,
+        nombre: nombreCliente,
+        telefono: telCliente,
+        tipoEntrega: tipoServicioActual,
+        mesa: numeroDeMesa,
+        productos: prodTexto,
+        totalProductos: formatearParaProductos(sumaProductosNum),
+        totalPagar: formatearParaPagar(sumaProductosNum),
+        metodoPago: metodoSeleccionado,
+        observaciones: observaciones,
+      };
+
+      mostrarLoader();
+
+      try {
+        const promesas = [];
+        const pedidoCoincidente = (pedidosGeneral || []).find(pd => pd.numeroFactura === facturaID) || null;
+        if (pedidoCoincidente && pedidoCoincidente.rowIndex != null) {
+          promesas.push(fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "pedidos.add", ...datosBase }) }));
+        } else {
+          promesas.push(fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "pedidos.add", ...datosBase }) }));
+        }
+
+        if (esMesa && (currentModulo === "nuevo" || currentModulo === "mesas")) {
+          promesas.push(fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "mesas.add", ...datosBase }) }));
+        }
+
+        await Promise.all(promesas);
+
+        // SINCRONIZACIÓN BIDIRECCIONAL: Si estamos en PEDIDOS y es tipo MESA, actualizar también MESAS
+        if (currentModulo === "gestion" && esMesa) {
+          const mesaCoincidente = (mesas || []).find(m => m.numeroFactura === facturaID) || null;
+          if (mesaCoincidente && mesaCoincidente.rowIndex != null) {
+            try {
+              await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "mesas.add", ...datosBase }) });
+            } catch (e) {
+              console.warn('No se pudo sincronizar con mesas:', e);
+            }
+          }
+        }
+
+        notificar("¡Hecho!", "success");
+        limpiarInterfazPedido();
+
+        // Asegurar que la UI quede limpia para el siguiente pedido
+        tipoServicioActual = null;
+        document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+        try {
+          actualizarMetodosPago("");
+        } catch (e) {
+          const sel = document.getElementById("metodoPagoSelect");
+          if (sel) sel.value = "";
+        }
+        const infoCliente = document.getElementById('info-cliente');
+        const contenidoPedido = document.getElementById('contenidoPedido');
+        const estadoVacio = document.getElementById('estadoVacio');
+        if (infoCliente) infoCliente.classList.add('hidden');
+        if (contenidoPedido) contenidoPedido.classList.add('hidden');
+        if (estadoVacio) estadoVacio.classList.remove('hidden');
+        pedidoModificado = false;
+        if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+
+        await fetchMesas(true);
+        if (currentModulo === "gestion" && typeof fetchPedidos === "function") {
+          await fetchPedidos();
+        }
+        return true;
+      } catch (error) {
+        console.error("Error en flujo:", error);
+        notificar("Ocurrió un error de red, inténtalo de nuevo", "error");
+        return false;
+      } finally {
+        ocultarLoader();
+      }
+    }
+
+    async function actualizarPedidoActual() {
+      if (!pedido || pedido.length === 0) {
+        notificar("No hay productos para actualizar", "error");
+        return;
+      }
+      const ok = await procesarGuardado();
+      if (ok) {
+        const sel = document.getElementById("metodoPagoSelect");
+        if (sel) {
+          sel.value = "";
+          // Re-render options to ensure placeholder selected
+          actualizarMetodosPago("");
+        }
+        pedidoModificado = false;
+        if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+      }
+    }
+
+    // ========================================
+    // FUNCIONES DE CONTROL DE BOTONES Y ESTADO
+    // ========================================
+    function actualizarUIBotones() {
+      const btnRealizar = document.getElementById("btn-realizar-pedido");
+      const btnSaldar = document.getElementById("btn-saldar-cuenta");
+      const btnActMesa = document.getElementById("btn-actualizar-mesa");
+      const btnActPedido = document.getElementById("btn-actualizar-pedido");
+      const btnGuardar = document.getElementById("btn-guardar");
+      const btnCerrar = document.getElementById("btn-cerrar");
+
+      [btnRealizar, btnSaldar, btnActMesa, btnActPedido, btnGuardar, btnCerrar].forEach((b) => b && b.classList.add("hidden"));
+
+      if (currentModulo === "nuevo") {
+        if (pedido && pedido.length > 0) {
+          btnRealizar && btnRealizar.classList.remove("hidden");
+        }
+      } else if (currentModulo === "mesas") {
+        if (mesaActiva && mesaActiva.numeroFactura && mesaActiva.numeroFactura !== "TEMP" && !pedidoModificado) {
+          btnSaldar && btnSaldar.classList.remove("hidden");
+        }
+        if (pedidoModificado && mesaActiva) {
+          btnActMesa && btnActMesa.classList.remove("hidden");
+        }
+      } else if (currentModulo === "gestion") {
+        if (pedidoModificado && mesaActiva) {
+          btnActPedido && btnActPedido.classList.remove("hidden");
+        }
+      }
+    }
+
+    function attachChangeDetectors() {
+      const ids = ["clienteNombre", "clienteTelefono", "observacionesInput", "clienteMesaEdicion"];
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", () => {
+          if (!pedidoModificado) pedidoModificado = true;
+          if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+        });
+      });
+
+      const sel = document.getElementById("metodoPagoSelect");
+      if (sel) {
+        sel.addEventListener("change", () => {
+          if (!pedidoModificado) pedidoModificado = true;
+          if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+        });
+      }
+    }
+
+    // ========================================
+    // FUNCIONES DE OPERACIONES CRÍTICAS
+    // ========================================
+    async function cerrarMesa() {
+      if (!mesaActiva || !mesaActiva.numeroFactura || mesaActiva.numeroFactura === "TEMP") {
+        notificar("No hay una selección válida para cerrar", "error");
+        return;
+      }
+
+      const metodoPagoFinal = document.getElementById("metodoPagoSelect").value;
+      if (!metodoPagoFinal) {
+        notificar("Seleccione un método de pago", "error");
+        return;
+      }
+
+      if (!(await notificarConfirm(`¿Estás seguro de cerrar la cuenta de la Mesa ${mesaActiva.mesa}?`))) return;
+
+      mostrarLoader();
+      const sumaProductosNum = pedido.reduce((a, b) => a + b.totalPrecio, 0);
+      const prodTexto = pedido.map((p) => `${p.nombre} x${p.cantidad} - $${Math.round(p.totalPrecio)}${p.instruccion ? ` (${p.instruccion})` : ""}`).join("\n");
+
+      const datosBase = {
+        action: "mesas.cerrar",
+        numeroFactura: mesaActiva.numeroFactura,
+        nombre: document.getElementById("clienteNombre").value || mesaActiva.nombre,
+        telefono: document.getElementById("clienteTelefono").value,
+        tipoEntrega: "Mesa",
+        mesa: document.getElementById("clienteMesaEdicion").value,
+        productos: prodTexto,
+        totalProductos: sumaProductosNum,
+        totalPagar: sumaProductosNum,
+        metodoPago: metodoPagoFinal,
+        observaciones: document.getElementById("observacionesInput").value,
+      };
+
+      try {
+        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(datosBase) });
+        const result = await response.json();
+
+        if (result.ok) {
+          notificar("Cuenta cerrada correctamente", "success");
+          mesaActiva = null;
+          pedido = [];
+          tipoServicioActual = null;
+          document.getElementById("contenidoPedido").classList.add("hidden");
+          document.getElementById("estadoVacio").classList.remove("hidden");
+          document.getElementById("info-cliente").classList.add("hidden");
+          limpiarCamposCliente();
+          document.querySelectorAll(".btn-tipo").forEach((b) => b.classList.remove("active"));
+          renderPedido();
+          await fetchMesas();
+        } else {
+          notificar("Ocurrió un error al procesar la solicitud", "error");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        notificar("Error de conexión, inténtalo de nuevo", "error");
+      } finally {
+        ocultarLoader();
+      }
+    }
+
+    async function eliminarMesa(idx, e) {
+      e.stopPropagation();
+      if (!(await notificarConfirm("¿Estás seguro? Se borrará la mesa y el pedido permanentemente."))) return;
+
+      mostrarLoader();
+      try {
+        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "mesas.delete", rowIndex: idx }) });
+        const res = await response.json();
+        if (res.ok) {
+          if (mesaActiva && mesaActiva.rowIndex === idx) {
+            mesaActiva = null;
+            pedido = [];
+            document.getElementById("contenidoPedido").classList.add("hidden");
+            document.getElementById("estadoVacio").classList.remove("hidden");
+            renderPedido();
+          }
+          await fetchMesas();
+        }
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        notificar("No se pudo completar la operación, inténtalo de nuevo", "error");
+      } finally {
+        ocultarLoader();
+      }
+    }
+
+    async function eliminarPedidoGeneral(idx) {
+      if (!(await notificarConfirm("¿Eliminar pedido?"))) return;
+      mostrarLoader();
+      try {
+        const pedidoObj = (pedidosGeneral || []).find((p) => p.rowIndex === idx) || null;
+        const promesas = [];
+        promesas.push(fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "pedidos.delete", rowIndex: idx }) }));
+
+        if (pedidoObj && pedidoObj.tipoEntrega === "Mesa") {
+          const mesaCoincidente = (mesas || []).find((m) => m.numeroFactura === pedidoObj.numeroFactura) || null;
+          if (mesaCoincidente && mesaCoincidente.rowIndex != null) {
+            promesas.push(fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "mesas.delete", rowIndex: mesaCoincidente.rowIndex }) }));
+          }
+        }
+
+        await Promise.all(promesas);
+        await fetchMesas();
+        await fetchPedidos();
+      } catch (error) {
+        console.error("Error al eliminar pedido:", error);
+        notificar("No se pudo completar la operación, inténtalo de nuevo", "error");
+      } finally {
+        ocultarLoader();
+      }
+    }
+
+    // ========================================
+    // INICIALIZACIÓN
+    // ========================================
+    fetchMesas();
+    fetchProductos();
+    actualizarMetodosPago("");
+
+    try {
+      attachChangeDetectors();
+    } catch (e) {
+      console.warn('No se pudieron inicializar detectores de cambio:', e);
+    }
+
+    // ========================================
+    // EVENT LISTENERS Y SINCRONIZACIÓN
+    // ========================================
+    document.addEventListener("focusin", (e) => {
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) estaEscribiendo = true;
+    });
+    document.addEventListener("focusout", () => (estaEscribiendo = false));
+
+    document.addEventListener("visibilitychange", () => {
+      pestañaActiva = document.visibilityState === "visible";
+    });
+
+    // Sincronización automática de mesas cada 5 segundos
+    setInterval(() => {
+      const modoPOSVisible = document.getElementById("col-contexto").style.display !== "none";
+      if (modoPOSVisible && pestañaActiva && !estaEscribiendo) {
+        fetchMesas();
+      }
+    }, SYNC_INTERVAL);
+
+    // Redimensionamiento dinámico de columnas
+    document.addEventListener("DOMContentLoaded", function () {
+      const resizers = document.querySelectorAll(".resizer");
+      resizers.forEach((resizer) => {
+        const leftPanel = resizer.previousElementSibling;
+        const rightPanel = resizer.nextElementSibling;
+
+        resizer.addEventListener("mousedown", function (e) {
+          e.preventDefault();
+          resizer.classList.add("resizing");
+          document.body.style.cursor = "col-resize";
+
+          const startX = e.clientX;
+          const leftStartWidth = leftPanel.offsetWidth;
+          const rightStartWidth = rightPanel ? rightPanel.offsetWidth : 0;
+
+          function onMouseMove(e) {
+            const deltaX = e.clientX - startX;
+            const newLeft = leftStartWidth + deltaX;
+            const newRight = rightStartWidth - deltaX;
+
+            if (newLeft > MIN_PANEL_WIDTH && newLeft < MAX_PANEL_WIDTH && newRight > MIN_PANEL_WIDTH) {
+              leftPanel.style.width = newLeft + "px";
+              if (rightPanel) rightPanel.style.width = newRight + "px";
+            }
+          }
+
+          function onMouseUp() {
+            resizer.classList.remove("resizing");
+            document.body.style.cursor = "default";
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+          }
+
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
