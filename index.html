@@ -91,6 +91,25 @@
       border-radius: 0 4px 4px 0;
     }
 
+    /* Botón toggle para mostrar/ocultar detalle pedido */
+.btn-toggle-pedido {
+  background: var(--primary);
+  color: white;
+  border: none;
+  justify-content: center;
+  padding: 0px;
+}
+
+    .btn-toggle-pedido.collapsed {
+      background: #cfd8dc;
+      color: #546e7a;
+    }
+
+    .btn-toggle-pedido.collapsed:hover {
+      background: #bdc6cd;
+    }
+
+
     /* Contenedor principal de la columna de productos */
     .productos-container-split {
       display: flex;
@@ -172,7 +191,7 @@
 
     #col-productos {
       flex: 1;
-      min-width: 400px;
+      min-width: 365px;
     }
 
     /* Esta columna se estira */
@@ -737,6 +756,307 @@
     #loader-global.hidden {
       display: none !important;
     }
+
+    /* ====================================== */
+    /* RESPONSIVE PARA MÓVILES EN HORIZONTAL */
+    /* ====================================== */
+
+    /* Modo paisaje en móviles (height < 500px) */
+    @media (max-height: 500px) and (min-width: 500px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        padding: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+
+      nav button {
+        padding: 10px 16px;
+        flex-direction: row;
+        gap: 8px;
+        font-size: 0.8rem;
+        width: auto;
+        margin: 0 4px;
+      }
+
+      nav button span {
+        font-size: 1.4rem;
+      }
+
+      nav button.active::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary);
+        border-radius: 0;
+      }
+
+      .main-layout {
+        width: 100%;
+        height: calc(100vh - 55px);
+        flex-direction: row;
+      }
+
+      .panel {
+        height: 100%;
+        border-bottom: none;
+        padding: 12px;
+      }
+
+      #col-contexto {
+        width: 18%;
+        min-width: 140px;
+      }
+
+      /* Reducir ancho de la columna de productos en móviles horizontales */
+      #col-productos {
+        flex: 1.7;
+        min-width: 200px;
+        max-width: 55%;
+      }
+
+      /* Dar un poco más de espacio al panel de pedido */
+      #col-pedido {
+        width: 32%;
+        min-width: 220px;
+      }
+
+      .productos-container-split {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .filtros-verticales-sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        max-height: 50px;
+        padding-bottom: 5px;
+      }
+
+      .btn-cat {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+
+      .lista-productos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 6px;
+      }
+
+      .producto {
+        padding: 10px;
+        font-size: 0.85rem;
+      }
+
+      #listaMesas {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .mesa {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+
+      .item-pedido {
+        padding: 6px;
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+      }
+
+      .item-name {
+        font-size: 0.8rem;
+      }
+
+      .item-controls button {
+        padding: 3px 6px;
+        font-size: 0.7rem;
+        min-width: 24px;
+      }
+
+      .totales-panel {
+        padding: 8px;
+        gap: 6px;
+      }
+
+      .total-row {
+        font-size: 1rem;
+        margin: 3px 0;
+      }
+
+      .acciones {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 8px 10px !important;
+        font-size: 0.9rem !important;
+        min-height: 38px !important;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      textarea,
+      select {
+        padding: 8px !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 6px !important;
+      }
+
+      #observacionesInput {
+        height: 40px !important;
+        min-height: 40px !important;
+      }
+
+      h2 {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+      }
+
+      .resizer {
+        width: 4px;
+        height: auto;
+      }
+    }
+
+    /* Móviles en horizontal ultra-compacto (height < 350px) */
+    @media (max-height: 350px) {
+      nav {
+        height: auto;
+      }
+
+      nav button {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        min-width: 65px;
+        margin: 0 2px;
+      }
+
+      nav button span {
+        font-size: 1.2rem;
+      }
+
+      .main-layout {
+        height: calc(100vh - 50px);
+      }
+
+      .panel {
+        padding: 10px;
+      }
+
+      #col-contexto {
+        max-height: 60px;
+      }
+
+      #col-productos {
+        max-height: 30%;
+      }
+
+      #col-pedido {
+        max-height: 55%;
+      }
+
+      .mesa {
+        padding: 8px;
+        font-size: 0.85rem;
+        min-height: 50px;
+      }
+
+      #listaMesas {
+        gap: 6px;
+      }
+
+      .producto {
+        padding: 8px;
+        min-height: 80px;
+        font-size: 0.8rem;
+      }
+
+      .item-pedido {
+        padding: 4px;
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+      }
+
+      .item-name {
+        font-size: 0.75rem;
+      }
+
+      .total-row {
+        font-size: 0.95rem;
+        margin: 2px 0;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 6px 8px !important;
+        font-size: 0.85rem !important;
+        min-height: 35px !important;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      textarea,
+      select {
+        padding: 6px !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 4px !important;
+      }
+
+      h2 {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+      }
+    }
+
+    /* Adaptación para pantallas muy anchas pero cortas */
+    @media (min-width: 1200px) and (max-height: 500px) {
+      nav {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        padding: 0;
+      }
+
+      nav button {
+        padding: 12px 18px;
+        flex-direction: row;
+        gap: 10px;
+        font-size: 0.85rem;
+      }
+
+      nav button span {
+        font-size: 1.5rem;
+      }
+
+      nav button.active::after {
+        bottom: -4px;
+        width: 100%;
+        height: 4px;
+      }
+
+      .main-layout {
+        flex-direction: row;
+        height: calc(100vh - 55px);
+      }
+
+      .panel {
+        height: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -850,7 +1170,9 @@
         <h2 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0">
           Detalle Pedido
         </h2>
-        <div id="contenedorVaciar"></div>
+        <div style="display: flex; gap: 8px;">
+          <div id="contenedorVaciar"></div>
+        </div>
       </div>
 
       <div id="estadoVacio" class="empty-state" style="text-align: center; color: #999; margin-top: 50px">
@@ -858,15 +1180,40 @@
         servicio
       </div>
 
-      <div id="contenidoPedido" class="hidden" style="
+      <!-- CONTENEDOR PRINCIPAL DEL PEDIDO -->
+      <div id="contenidoPedido" class="contenido-pedido-collapse hidden" style="
             display: flex;
             flex-direction: column;
             flex: 1;
             overflow: hidden;
+            position: relative;
           ">
-        <div id="pedido" class="scroll-area"></div>
+        
 
-        <div class="totales-panel">
+        <!-- LISTA DE PRODUCTOS AGREGADOS - SIEMPRE VISIBLE -->
+        <div id="lista-productos-pedido" style="
+              flex: 1;
+              overflow-y: auto;
+              padding: 10px 0;
+              border-bottom: 2px solid #f0f0f0;
+              min-height: 100px;
+            ">
+          <div id="pedido" class="scroll-area"></div>
+        </div>
+
+                <!-- BOTÓN TOGGLE FLOTANTE EN ESQUINA INFERIOR DERECHA -->
+        <button id="btn-toggle-pedido" class="btn-toggle-pedido hidden" onclick="toggleContenidoPedido()" title="Mostrar/Ocultar detalles">
+          ▼
+        </button>
+        
+
+        <!-- PANEL DE TOTALES - COLAPSABLE -->
+        <div class="totales-panel" id="totales-panel-colapsable" style="
+              flex-shrink: 0;
+              max-height: 400px;
+              overflow-y: auto;
+              transition: all 0.3s ease;
+            ">
           <div id="info-cliente" class="hidden">
             <div id="contenedor-editar-mesa" class="hidden" style="
                   margin-bottom: 10px;
@@ -955,6 +1302,7 @@
     let tipoServicioActual = null;
     let currentModulo = "nuevo";
     let pedidoModificado = false;
+    let totalesOpen = true; // controla si el panel de totales está visible (para móviles)
 
     // Estado de sincronización
     let estaEscribiendo = false;
@@ -1182,6 +1530,84 @@
       if (typeof actualizarUIBotones === "function") actualizarUIBotones();
     }
 
+    // ========================================
+    // FUNCIÓN TOGGLE PARA MOSTRAR/OCULTAR TOTALES
+    // ========================================
+    function isMobileLayout() {
+      return window.innerWidth <= 767 || (window.innerHeight < 500 && window.innerWidth >= 500);
+    }
+
+    function setTotalesState(open) {
+      const totalPanel = document.getElementById('totales-panel-colapsable');
+      const btnToggle = document.getElementById('btn-toggle-pedido');
+      if (!totalPanel || !btnToggle) return;
+
+      totalesOpen = !!open;
+
+      if (totalesOpen) {
+        totalPanel.style.maxHeight = totalPanel.getAttribute('data-max') || '400px';
+        totalPanel.style.opacity = '1';
+        totalPanel.style.overflow = 'auto';
+        btnToggle.classList.remove('collapsed');
+        btnToggle.innerHTML = '▲';
+      } else {
+        totalPanel.style.maxHeight = '0px';
+        totalPanel.style.opacity = '0';
+        totalPanel.style.overflow = 'hidden';
+        btnToggle.classList.add('collapsed');
+        btnToggle.innerHTML = '▼';
+      }
+      // actualizar posicíon de la pestaña según estado y tamaño
+      updateTogglePosition();
+    }
+
+    function toggleContenidoPedido() {
+      setTotalesState(!totalesOpen);
+    }
+
+    function updateTogglePosition() {
+      const btn = document.getElementById('btn-toggle-pedido');
+      const totalPanel = document.getElementById('totales-panel-colapsable');
+      if (!btn) return;
+
+      // ocultar en escritorio
+      if (!isMobileLayout()) {
+        btn.style.display = 'none';
+        return;
+      }
+
+      btn.style.display = 'flex';
+
+      try {
+        if (!totalPanel) {
+          // pestaña en esquina inferior derecha
+          btn.style.right = '100px';
+          btn.style.bottom = '0px';
+          return;
+        }
+
+        const rect = totalPanel.getBoundingClientRect();
+        // si totales están abiertos, colocar la pestaña justo encima del panel
+        if (totalesOpen && rect.top < window.innerHeight) {
+          const distanceFromBottom = Math.max(12, window.innerHeight - rect.top + 10);
+          btn.style.right = '100px';
+          btn.style.bottom = `${distanceFromBottom}px`;
+        } else {
+          // si está cerrado, pestaña en el borde inferior
+          btn.style.right = '100px';
+          btn.style.bottom = '0px';
+        }
+      } catch (e) {
+        btn.style.right = '100px';
+        btn.style.bottom = '0px';
+      }
+    }
+
+    window.addEventListener('resize', function () {
+      // recalcular posición en resize/orientación
+      try { updateTogglePosition(); } catch (e) { }
+    });
+
     function setTipoServicio(tipo) {
       if (tipoServicioActual === tipo) {
         tipoServicioActual = null;
@@ -1206,6 +1632,9 @@
 
       document.getElementById("info-cliente").classList.remove("hidden");
       document.getElementById("contenidoPedido").classList.remove("hidden");
+      document.getElementById("btn-toggle-pedido").classList.remove("hidden");
+      // Mantener totales colapsados en móvil al elegir servicio
+      if (isMobileLayout()) setTotalesState(false);
       document.getElementById("estadoVacio").classList.add("hidden");
 
       const contenedorMesa = document.getElementById("contenedor-editar-mesa");
@@ -1331,6 +1760,9 @@
 
       document.getElementById("estadoVacio").classList.add("hidden");
       document.getElementById("contenidoPedido").classList.remove("hidden");
+      document.getElementById("btn-toggle-pedido").classList.remove("hidden");
+      // En móviles, iniciar con totales colapsados
+      if (isMobileLayout()) setTotalesState(false);
       document.getElementById("clienteNombre").value = p.nombre || "";
       document.getElementById("clienteTelefono").value = p.telefono || "";
       document.getElementById("observacionesInput").value = p.observaciones || "";
@@ -1401,6 +1833,9 @@
         document.getElementById("btn-mesa")?.classList.add("active");
         document.getElementById("estadoVacio").classList.add("hidden");
         document.getElementById("contenidoPedido").classList.remove("hidden");
+        document.getElementById("btn-toggle-pedido").classList.remove("hidden");
+        // Iniciar totales colapsados en móvil para no ocultar la lista de productos
+        if (isMobileLayout()) setTotalesState(false);
         document.getElementById("contenedor-editar-mesa").classList.remove("hidden");
         document.getElementById("clienteMesaEdicion").value = m.mesa || "";
         document.getElementById("clienteNombre").value = m.nombre || "";
@@ -1476,6 +1911,8 @@
       pedidoModificado = true;
       renderPedido();
       document.getElementById("pedido").scrollTo({ top: 9999, behavior: "smooth" });
+      // En móviles, mantener panel de totales colapsado hasta que el mesero lo abra
+      if (isMobileLayout()) setTotalesState(false);
     }
 
     // ========================================
@@ -1521,6 +1958,15 @@
 
       document.getElementById("totalPagar").textContent = formatearParaPagar(total);
       if (typeof actualizarUIBotones === "function") actualizarUIBotones();
+
+      // Mantener sincronizado el estado del panel de totales (no forzar apertura en móviles)
+      if (isMobileLayout()) {
+        // si totalesOpen es false, aseguramos que el panel esté colapsado
+        setTotalesState(!!totalesOpen);
+      } else {
+        // en pantallas grandes siempre mostrar totales
+        setTotalesState(true);
+      }
     }
 
     function habilitarEdicionNota(i) {
@@ -1948,6 +2394,25 @@
           document.addEventListener("mouseup", onMouseUp);
         });
       });
+      // Inicializar estado del panel de totales según tamaño de pantalla
+      try {
+        const totales = document.getElementById('totales-panel-colapsable');
+        const btnToggle = document.getElementById('btn-toggle-pedido');
+        if (totales) {
+          // guardar altura máxima deseada
+          const currentMax = totales.style.maxHeight || '400px';
+          totales.setAttribute('data-max', currentMax);
+        }
+        // por defecto ocultar totales en vistas móviles
+        if (typeof setTotalesState === 'function') setTotalesState(!isMobileLayout());
+        if (btnToggle) {
+          // mostrar el botón solo si el contenidoPedido está visible
+          const contenido = document.getElementById('contenidoPedido');
+          if (contenido && !contenido.classList.contains('hidden')) btnToggle.classList.remove('hidden');
+        }
+      } catch (e) {
+        console.warn('Inicialización totales fallida', e);
+      }
     });
   </script>
 </body>
